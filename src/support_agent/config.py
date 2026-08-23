@@ -20,11 +20,17 @@ class Settings:
     freshness_reference_date: date = date(2026, 8, 23)
     freshness_max_age_days: int = 365
     lifecycle_db_path: Path = Path(__file__).resolve().parents[2] / "data" / "support_agent.db"
-    reviewer_api_key: str = "dev-reviewer-key"
+    reviewer_api_key_sha256: str = (
+        "2636892cb3695595303bfee4a077276f34a1f9be4a2879257bc4111b5ecc37c0"
+    )
     reviewer_actor: str = "service-desk-lead"
-    executor_api_key: str = "dev-executor-key"
+    executor_api_key_sha256: str = (
+        "8a059a3e30ba84bd7b957c156d42b3e4cb5d61bf5712de83ebdd956c06e1204a"
+    )
     executor_actor: str = "automation-operator"
-    auditor_api_key: str = "dev-auditor-key"
+    auditor_api_key_sha256: str = (
+        "46151c35c1c09bca0b049ce55099e4f67fd04efe91716eec70fd1fa8ce898163"
+    )
     auditor_actor: str = "audit-reader"
 
     @classmethod
@@ -50,10 +56,16 @@ class Settings:
             lifecycle_db_path=Path(
                 os.getenv("LIFECYCLE_DB_PATH", defaults.lifecycle_db_path)
             ),
-            reviewer_api_key=os.getenv("REVIEWER_API_KEY", defaults.reviewer_api_key),
+            reviewer_api_key_sha256=os.getenv(
+                "REVIEWER_API_KEY_SHA256", defaults.reviewer_api_key_sha256
+            ),
             reviewer_actor=os.getenv("REVIEWER_ACTOR", defaults.reviewer_actor),
-            executor_api_key=os.getenv("EXECUTOR_API_KEY", defaults.executor_api_key),
+            executor_api_key_sha256=os.getenv(
+                "EXECUTOR_API_KEY_SHA256", defaults.executor_api_key_sha256
+            ),
             executor_actor=os.getenv("EXECUTOR_ACTOR", defaults.executor_actor),
-            auditor_api_key=os.getenv("AUDITOR_API_KEY", defaults.auditor_api_key),
+            auditor_api_key_sha256=os.getenv(
+                "AUDITOR_API_KEY_SHA256", defaults.auditor_api_key_sha256
+            ),
             auditor_actor=os.getenv("AUDITOR_ACTOR", defaults.auditor_actor),
         )

@@ -21,6 +21,7 @@ from support_agent.domain.lifecycle import (
 )
 from support_agent.domain.recommendation import Evaluation, Recommendation
 from support_agent.domain.response import AssistResponse
+from support_agent.domain.servicenow import ServiceNowSandboxAction
 
 __all__ = [
     "Approval",
@@ -43,4 +44,5 @@ __all__ = [
     "Recommendation",
     "RecommendationStatus",
     "RejectionDecision",
+    "ServiceNowSandboxAction",
 ]

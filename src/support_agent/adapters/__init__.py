@@ -11,6 +11,7 @@ from support_agent.adapters.lifecycle_errors import (
     DuplicateRecommendationError,
     RecommendationNotFoundError,
 )
+from support_agent.adapters.servicenow_sandbox_executor import ServiceNowSandboxExecutor
 from support_agent.adapters.sqlite_lifecycle_repository import SqliteLifecycleRepository
 
 __all__ = [
@@ -20,4 +21,5 @@ __all__ = [
     "KnowledgeDataError",
     "RecommendationNotFoundError",
     "SqliteLifecycleRepository",
+    "ServiceNowSandboxExecutor",
 ]

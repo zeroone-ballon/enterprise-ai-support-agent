@@ -2,7 +2,7 @@
 
 Enterprise AI Support Agent is an auditable IT support decision-support PoC. It will retrieve relevant knowledge, propose grounded responses and next actions, evaluate risk, and hold actions for human approval.
 
-Phase 7 makes the controlled lifecycle durable and authenticated. SQLite preserves recommendations and audit history across restarts, role-specific API keys protect lifecycle operations, and idempotency keys prevent duplicate mock executions.
+Phase 8 hardens the integration boundary. Versioned SQLite migrations preserve existing Phase 7 data, only API-key hashes are configured, and approved actions are translated into a ServiceNow-compatible sandbox outbox without making an HTTP request.
 
 ## Requirements
 
@@ -24,7 +24,7 @@ source .env
 set +a
 ```
 
-`POST /assist` remains API-key-free for the local demo. Recommendation review, execution, retrieval, and audit endpoints require the Phase 7 role keys. Replace all development keys outside local demonstration.
+`POST /assist` remains API-key-free for the local demo. Recommendation review, execution, retrieval, and audit endpoints require role keys. The server stores only SHA-256 digests; replace all development credentials outside local demonstration.
 
 ## Run
 
@@ -194,9 +194,25 @@ The `adapters`, `domain`, and `services` packages keep infrastructure, business 
 - [x] Duplicate retries return the original receipt without duplicate audit events
 - [x] SQLite and execution adapters remain behind domain ports
 
+### Phase 8 — Migration and ServiceNow sandbox boundary
+
+- [x] Ordered SQLite schema migrations with applied-version history
+- [x] Safe upgrade of an existing Phase 7 database without data loss
+- [x] SHA-256 API-key digest configuration with constant-time comparison
+- [x] No plaintext API keys in server settings
+- [x] Typed ServiceNow-compatible incident update contract
+- [x] Durable local sandbox outbox
+- [x] Recommendation, evidence, work-note, and correlation mappings
+- [x] No ServiceNow URL, credential, or network call
+- [x] Contract and migration regression tests
+
 ## Next phase
 
-Phase 8 can add database migrations, hashed credential storage or OIDC, and a sandboxed ServiceNow-compatible adapter with contract tests.
+## Remaining roadmap
+
+- **Phase 9:** optional LLM provider boundary, structured generation, grounding guardrails, and deterministic fallback
+- **Phase 10:** evaluation report, observability, containerization, CI, and deployment hardening
+- **Phase 11:** final end-to-end demo, architecture and threat-model documentation, portfolio packaging, and release candidate
 
 ## Inspect Phase 4 retrieval
 

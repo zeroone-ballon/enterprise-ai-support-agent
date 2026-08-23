@@ -8,6 +8,7 @@ from support_agent.adapters.lifecycle_errors import (
     DuplicateRecommendationError,
     RecommendationNotFoundError,
 )
+from support_agent.adapters.sqlite_migrations import apply_migrations
 from support_agent.domain import AssistResponse, AuditEvent, ExecutionResult
 
 
@@ -27,28 +28,7 @@ class SqliteLifecycleRepository:
 
     def _initialize(self) -> None:
         with self._connect() as connection:
-            connection.executescript(
-                """
-                CREATE TABLE IF NOT EXISTS recommendations (
-                    recommendation_id TEXT PRIMARY KEY,
-                    response_json TEXT NOT NULL
-                );
-                CREATE TABLE IF NOT EXISTS audit_events (
-                    recommendation_id TEXT NOT NULL,
-                    sequence INTEGER NOT NULL,
-                    event_json TEXT NOT NULL,
-                    PRIMARY KEY (recommendation_id, sequence),
-                    FOREIGN KEY (recommendation_id) REFERENCES recommendations(recommendation_id)
-                );
-                CREATE TABLE IF NOT EXISTS execution_results (
-                    recommendation_id TEXT NOT NULL,
-                    idempotency_key TEXT NOT NULL,
-                    result_json TEXT NOT NULL,
-                    PRIMARY KEY (recommendation_id, idempotency_key),
-                    FOREIGN KEY (recommendation_id) REFERENCES recommendations(recommendation_id)
-                );
-                """
-            )
+            apply_migrations(connection)
 
     def create(self, response: AssistResponse) -> None:
         with self._lock, self._connect() as connection:
