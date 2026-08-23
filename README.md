@@ -2,7 +2,7 @@
 
 Enterprise AI Support Agent is an auditable IT support decision-support PoC. It will retrieve relevant knowledge, propose grounded responses and next actions, evaluate risk, and hold actions for human approval.
 
-Phase 2 provides the FastAPI foundation plus strict domain models for incident intake, knowledge evidence, recommendation, evaluation, and human approval. It intentionally does not implement retrieval or the `/assist` workflow yet.
+Phase 3 provides the FastAPI foundation, strict domain models, and a fictional evaluation dataset for incident classification, knowledge retrieval, abstention, freshness, and risk behavior. It intentionally does not implement retrieval or the `/assist` workflow yet.
 
 ## Requirements
 
@@ -65,6 +65,8 @@ enterprise-ai-support-agent/
 │   ├── config.py        # Runtime configuration
 │   └── main.py          # FastAPI application factory
 ├── tests/
+├── data/                # Fictional incidents, knowledge, and gold outcomes
+├── docs/                # Design notes for the demo and evaluation data
 ├── .env.example
 ├── .python-version
 ├── uv.lock
@@ -96,6 +98,16 @@ The empty `adapters`, `domain`, and `services` packages are intentional architec
 - [x] Cross-model grounding and confidence invariants
 - [x] Automated validation tests
 
+### Phase 3 — Demo and evaluation data
+
+- [x] Eight fictional incidents
+- [x] Eleven fictional knowledge articles
+- [x] Gold retrieval and safety outcomes
+- [x] Primary, ambiguous, insufficient-context, no-match, stale, and high-risk cases
+- [x] Draft and retired articles for retrieval-exclusion tests
+- [x] Deterministic freshness reference date
+- [x] Automated fixture and reference-integrity tests
+
 ## Next phase
 
-Phase 3 will add fictional JSON incident and knowledge datasets, including successful, ambiguous, insufficient-context, missing-knowledge, stale-knowledge, and high-risk cases.
+Phase 4 will add a JSON knowledge repository and an explainable deterministic retriever with weighted title, tag, and content matching, publication filtering, and Top-3 results.

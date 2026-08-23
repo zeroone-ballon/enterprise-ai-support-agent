@@ -1,0 +1,102 @@
+[
+  {
+    "knowledge_id": "KB-DEMO-001",
+    "title": "Recover a locked corporate VPN account",
+    "content": "Use this procedure when the VPN client explicitly reports that the corporate account is locked. First verify the caller using the approved identity-verification process. Check the identity provider for the lock state and recent failed attempts. Unlock the account only after identity verification. Ask the user to update the saved VPN password, retry the connection, and confirm access. Do not reset MFA or disclose account details during this procedure.",
+    "category": "access",
+    "tags": ["vpn", "account", "locked", "remote-access", "identity-verification"],
+    "status": "published",
+    "updated_at": "2026-07-10"
+  },
+  {
+    "knowledge_id": "KB-DEMO-002",
+    "title": "Diagnose a corporate VPN client connection failure",
+    "content": "Use this article when the VPN client cannot connect but does not report an account lock. Record the client name, version, exact error, network type, and timestamp. Confirm general internet access, verify system time, restart the supported VPN client, and retry once. Escalate certificate, gateway, or repeated authentication failures with the collected diagnostics. Never disable endpoint protection or change certificate stores without specialist approval.",
+    "category": "network",
+    "tags": ["vpn", "connection", "client", "remote-access", "diagnostics"],
+    "status": "published",
+    "updated_at": "2026-06-18"
+  },
+  {
+    "knowledge_id": "KB-DEMO-003",
+    "title": "Troubleshoot a Microsoft 365 sign-in loop",
+    "content": "Use this procedure when Microsoft 365 accepts credentials but repeatedly returns to the sign-in page. Confirm the service status and test a private browser window. Clear only Microsoft 365 site cookies, then retry. Check whether the issue affects one browser, one device, or all clients. If MFA succeeds and the account is not locked, do not reset the password by default. Escalate with the correlation ID and timestamp when the loop persists.",
+    "category": "access",
+    "tags": ["microsoft-365", "sign-in", "login-loop", "browser", "outlook"],
+    "status": "published",
+    "updated_at": "2026-07-22"
+  },
+  {
+    "knowledge_id": "KB-DEMO-004",
+    "title": "Respond to suspected Microsoft 365 account compromise",
+    "content": "Treat unfamiliar sign-in alerts, impossible travel, or unexpected MFA prompts as a potential security incident. Preserve the alert details and timestamp, verify the reporter, and notify the security response channel. Revoke active sessions or reset credentials only through the approved security workflow. Do not disable MFA merely to restore productivity. Any MFA recovery, session revocation, credential reset, or account containment action requires human approval and an audit record.",
+    "category": "security",
+    "tags": ["microsoft-365", "compromise", "mfa", "security-incident", "containment"],
+    "status": "published",
+    "updated_at": "2026-08-02"
+  },
+  {
+    "knowledge_id": "KB-DEMO-005",
+    "title": "Safely recover disk space on a managed Windows PC",
+    "content": "Confirm the free space on drive C and record the largest storage categories. Empty the recycle bin with the user's confirmation, remove approved temporary files through Windows Storage settings, and uninstall only software already approved for removal. Do not delete business documents, user profile folders, system files, recovery partitions, or security logs. Escalate when free space remains below 10 GB after approved cleanup.",
+    "category": "hardware",
+    "tags": ["windows", "disk-space", "storage", "cleanup", "managed-device"],
+    "status": "published",
+    "updated_at": "2026-05-30"
+  },
+  {
+    "knowledge_id": "KB-DEMO-006",
+    "title": "Escalate a disk-encryption recovery-key request",
+    "content": "Use this article when a managed device requests an encryption recovery key before startup. Verify the asset and user through the approved process. Do not disclose, copy, or send a recovery key through an unapproved channel. Route the request to the endpoint security team and record the authorization reference. This article is not a disk-space cleanup procedure.",
+    "category": "security",
+    "tags": ["windows", "disk", "encryption", "recovery-key", "escalation"],
+    "status": "published",
+    "updated_at": "2026-06-05"
+  },
+  {
+    "knowledge_id": "KB-DEMO-007",
+    "title": "Triage an unspecified remote-access problem",
+    "content": "When a remote user cannot identify the failing service, collect the application or service name, exact error, screenshot, time of failure, network type, device type, and whether normal internet access works. Determine whether the problem involves VPN, virtual desktop, identity, or a specific business application before proposing remediation. If the information remains insufficient, abstain from a technical fix and request the missing details.",
+    "category": "network",
+    "tags": ["remote-access", "triage", "vpn", "information-required", "diagnostics"],
+    "status": "published",
+    "updated_at": "2026-07-01"
+  },
+  {
+    "knowledge_id": "KB-DEMO-008",
+    "title": "Minimum diagnostic information for an unclassified issue",
+    "content": "Before diagnosing an unspecified application problem, collect the application name, affected user or device scope, exact error text, screenshot, occurrence time, recent changes, and reproduction steps. A statement such as application does not work is not sufficient evidence for a resolution. Request the missing information and avoid proposing configuration changes until the affected system is identified.",
+    "category": "support",
+    "tags": ["triage", "application", "information-required", "error-message", "reproduction-steps"],
+    "status": "published",
+    "updated_at": "2026-07-12"
+  },
+  {
+    "knowledge_id": "KB-DEMO-009",
+    "title": "LegacyConnect 4.x certificate renewal workaround",
+    "content": "Historical procedure for LegacyConnect 4.x certificate failures: remove the old client certificate, import the renewed certificate, and restart the LegacyConnect service. LegacyConnect 4.x is no longer supported and this procedure has not been reviewed against the current endpoint-security baseline. Do not execute these steps without specialist review; migrate the device to the supported VPN client.",
+    "category": "network",
+    "tags": ["legacyconnect", "vpn", "certificate", "legacy-client", "workaround"],
+    "status": "published",
+    "updated_at": "2022-11-15"
+  },
+  {
+    "knowledge_id": "KB-DEMO-010",
+    "title": "Legacy VPN password reset without identity verification",
+    "content": "Retired historical procedure. This article must never be used for recommendations because it omits the current identity-verification and audit requirements.",
+    "category": "access",
+    "tags": ["vpn", "password-reset", "legacy", "identity", "retired"],
+    "status": "retired",
+    "updated_at": "2021-03-08"
+  },
+  {
+    "knowledge_id": "KB-DEMO-011",
+    "title": "Draft Microsoft 365 browser cache reset",
+    "content": "Unreviewed draft containing a proposed browser-reset sequence. Draft articles are excluded from retrieval and must not support an answer.",
+    "category": "access",
+    "tags": ["microsoft-365", "browser-cache", "draft", "sign-in", "unreviewed"],
+    "status": "draft",
+    "updated_at": "2026-08-15"
+  }
+]
+

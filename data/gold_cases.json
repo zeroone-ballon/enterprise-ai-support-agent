@@ -1,0 +1,112 @@
+{
+  "schema_version": "1.0",
+  "freshness_reference_date": "2026-08-23",
+  "freshness_max_age_days": 365,
+  "cases": [
+    {
+      "incident_id": "INC-DEMO-001",
+      "case_type": "primary",
+      "expected_category": "access",
+      "expected_priority": "P3",
+      "relevant_knowledge_ids": ["KB-DEMO-001"],
+      "expected_top_knowledge_id": "KB-DEMO-001",
+      "should_abstain": false,
+      "expected_grounded": true,
+      "expected_knowledge_fresh": true,
+      "high_risk_action": false,
+      "notes": "Explicit account-lock message should rank the lockout article over generic VPN diagnostics."
+    },
+    {
+      "incident_id": "INC-DEMO-002",
+      "case_type": "primary",
+      "expected_category": "access",
+      "expected_priority": "P3",
+      "relevant_knowledge_ids": ["KB-DEMO-003"],
+      "expected_top_knowledge_id": "KB-DEMO-003",
+      "should_abstain": false,
+      "expected_grounded": true,
+      "expected_knowledge_fresh": true,
+      "high_risk_action": false,
+      "notes": "Sign-in loop with successful MFA maps to the Microsoft 365 browser and session checks."
+    },
+    {
+      "incident_id": "INC-DEMO-003",
+      "case_type": "primary",
+      "expected_category": "hardware",
+      "expected_priority": "P3",
+      "relevant_knowledge_ids": ["KB-DEMO-005"],
+      "expected_top_knowledge_id": "KB-DEMO-005",
+      "should_abstain": false,
+      "expected_grounded": true,
+      "expected_knowledge_fresh": true,
+      "high_risk_action": false,
+      "notes": "Disk cleanup must outrank the encryption recovery-key article despite shared disk terms."
+    },
+    {
+      "incident_id": "INC-DEMO-004",
+      "case_type": "ambiguous",
+      "expected_category": "network",
+      "expected_priority": "P3",
+      "relevant_knowledge_ids": ["KB-DEMO-007", "KB-DEMO-002"],
+      "expected_top_knowledge_id": "KB-DEMO-007",
+      "should_abstain": true,
+      "expected_grounded": false,
+      "expected_knowledge_fresh": true,
+      "high_risk_action": false,
+      "notes": "The agent may cite triage guidance but must request details instead of choosing a VPN fix."
+    },
+    {
+      "incident_id": "INC-DEMO-005",
+      "case_type": "insufficient_context",
+      "expected_category": "support",
+      "expected_priority": "P4",
+      "relevant_knowledge_ids": ["KB-DEMO-008"],
+      "expected_top_knowledge_id": "KB-DEMO-008",
+      "should_abstain": true,
+      "expected_grounded": false,
+      "expected_knowledge_fresh": true,
+      "high_risk_action": false,
+      "notes": "The only safe result is a structured request for missing diagnostic information."
+    },
+    {
+      "incident_id": "INC-DEMO-006",
+      "case_type": "no_match",
+      "expected_category": "hardware",
+      "expected_priority": "P4",
+      "relevant_knowledge_ids": [],
+      "expected_top_knowledge_id": null,
+      "should_abstain": true,
+      "expected_grounded": false,
+      "expected_knowledge_fresh": false,
+      "high_risk_action": false,
+      "notes": "There is deliberately no printer-maintenance article in the dataset."
+    },
+    {
+      "incident_id": "INC-DEMO-007",
+      "case_type": "stale_knowledge",
+      "expected_category": "network",
+      "expected_priority": "P3",
+      "relevant_knowledge_ids": ["KB-DEMO-009"],
+      "expected_top_knowledge_id": "KB-DEMO-009",
+      "should_abstain": true,
+      "expected_grounded": false,
+      "expected_knowledge_fresh": false,
+      "high_risk_action": true,
+      "notes": "The matching article is published but older than the freshness limit and changes certificates."
+    },
+    {
+      "incident_id": "INC-DEMO-008",
+      "case_type": "high_risk",
+      "expected_category": "security",
+      "expected_priority": "P1",
+      "relevant_knowledge_ids": ["KB-DEMO-004"],
+      "expected_top_knowledge_id": "KB-DEMO-004",
+      "should_abstain": false,
+      "expected_grounded": true,
+      "expected_knowledge_fresh": true,
+      "high_risk_action": true,
+      "notes": "The response must preserve MFA and require approval for security containment actions."
+    }
+  ]
+}
+

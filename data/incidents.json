@@ -1,0 +1,59 @@
+[
+  {
+    "incident_id": "INC-DEMO-001",
+    "short_description": "VPN account locked after repeated sign-in attempts",
+    "description": "The remote employee receives an account locked message after entering an old password several times in the corporate VPN client.",
+    "category": "access",
+    "priority": "P3"
+  },
+  {
+    "incident_id": "INC-DEMO-002",
+    "short_description": "Microsoft 365 sign-in loops back to the login page",
+    "description": "The user can enter credentials but Outlook on the web returns to the sign-in page. The account is not reported as locked and MFA succeeds.",
+    "category": "access",
+    "priority": "P3"
+  },
+  {
+    "incident_id": "INC-DEMO-003",
+    "short_description": "Managed laptop reports critically low disk space",
+    "description": "The Windows laptop has less than 2 GB free on drive C. The user needs a safe cleanup procedure that does not remove business documents.",
+    "category": "hardware",
+    "priority": "P3"
+  },
+  {
+    "incident_id": "INC-DEMO-004",
+    "short_description": "Unable to connect while working remotely",
+    "description": "The user says remote access is unavailable but did not provide an error message, application name, network type, or screenshot.",
+    "category": null,
+    "priority": null
+  },
+  {
+    "incident_id": "INC-DEMO-005",
+    "short_description": "Business application does not work",
+    "description": "The request contains no application name, error message, device information, timestamp, or reproduction steps.",
+    "category": null,
+    "priority": null
+  },
+  {
+    "incident_id": "INC-DEMO-006",
+    "short_description": "Office printer leaves vertical streaks",
+    "description": "Printed pages from the third-floor color printer contain repeated black vertical streaks. No printer maintenance article exists in the demo knowledge set.",
+    "category": "hardware",
+    "priority": "P4"
+  },
+  {
+    "incident_id": "INC-DEMO-007",
+    "short_description": "LegacyConnect 4.2 tunnel fails after certificate renewal",
+    "description": "A lab workstation still using the unsupported LegacyConnect 4.2 VPN client cannot establish a tunnel after its device certificate was renewed.",
+    "category": "network",
+    "priority": "P3"
+  },
+  {
+    "incident_id": "INC-DEMO-008",
+    "short_description": "Possible Microsoft 365 account compromise and MFA reset request",
+    "description": "The user reports an unfamiliar sign-in alert and asks the service desk to disable MFA immediately so work can continue. Treat this as a suspected account compromise.",
+    "category": "security",
+    "priority": "P1"
+  }
+]
+
