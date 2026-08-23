@@ -2,7 +2,7 @@
 
 Enterprise AI Support Agent is an auditable IT support decision-support PoC. It will retrieve relevant knowledge, propose grounded responses and next actions, evaluate risk, and hold actions for human approval.
 
-Phase 5 provides the first end-to-end, deterministic `/assist` workflow: incident classification, explainable Top-3 retrieval, grounded recommendation or explicit abstention, safety evaluation, confidence, and mandatory human approval.
+Phase 6 adds a controlled human-approval lifecycle to the deterministic assistance workflow. Recommendations can be approved or rejected, approved recommendations can cross only a mock-execution boundary, and every accepted transition is recorded in an append-only audit history.
 
 ## Requirements
 
@@ -21,7 +21,7 @@ Optional local configuration:
 cp .env.example .env
 ```
 
-No API key is required for Phase 5.
+No API key is required for Phase 6.
 
 ## Run
 
@@ -60,7 +60,23 @@ curl -s http://127.0.0.1:8000/assist \
   }'
 ```
 
-The assistance response includes classification, recommendation or abstention, Top-3 evidence, evaluation signals, confidence, and approval state. It always remains `pending_approval`; Phase 5 does not execute changes.
+The assistance response includes classification, recommendation or abstention, Top-3 evidence, evaluation signals, confidence, and approval state. It starts as `pending_approval` and never performs an external action.
+
+Approve and safely simulate execution using the returned recommendation ID:
+
+```bash
+curl -s http://127.0.0.1:8000/recommendations/REC-INC-LIVE-001/approve \
+  -H 'Content-Type: application/json' \
+  -d '{"reviewer":"service-desk-lead","reason":"Evidence verified"}'
+
+curl -s http://127.0.0.1:8000/recommendations/REC-INC-LIVE-001/execute \
+  -H 'Content-Type: application/json' \
+  -d '{"executor":"automation-operator"}'
+
+curl -s http://127.0.0.1:8000/recommendations/REC-INC-LIVE-001/audit
+```
+
+The execution receipt always reports `"status":"simulated"` and `"side_effects":false`. Phase 6 state is intentionally in memory and resets when the application process restarts.
 
 ## Test and lint
 
@@ -146,9 +162,22 @@ The `adapters`, `domain`, and `services` packages keep infrastructure, business 
 - [x] Mandatory `pending_approval` state with no execution side effects
 - [x] Gold-case workflow and HTTP contract tests
 
+### Phase 6 — Approval, audit, and mock execution
+
+- [x] Explicit pending → approved → executed state machine
+- [x] Explicit pending → rejected terminal transition
+- [x] Approval blocked for abstained recommendations
+- [x] Execution blocked unless a human first approves
+- [x] Required reviewer, rejection reason, executor, and timestamps
+- [x] Append-only, contiguous audit event history
+- [x] In-memory lifecycle repository behind a domain port
+- [x] Mock executor behind an execution port
+- [x] Simulation receipt proving no external side effects
+- [x] HTTP 404, 409, and 422 error contracts
+
 ## Next phase
 
-Phase 6 will add approval and rejection transitions plus an append-only audit trail and mock execution boundary.
+Phase 7 can replace in-memory lifecycle state with durable persistence, add identity and authorization, and introduce an idempotent external-system adapter sandbox.
 
 ## Inspect Phase 4 retrieval
 

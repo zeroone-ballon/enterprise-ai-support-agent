@@ -2,11 +2,16 @@
 
 from fastapi import FastAPI
 
-from support_agent.adapters import JsonKnowledgeRepository
+from support_agent.adapters import InMemoryLifecycleRepository, JsonKnowledgeRepository
 from support_agent.api.routes.assist import router as assist_router
 from support_agent.api.routes.health import router as health_router
+from support_agent.api.routes.lifecycle import router as lifecycle_router
 from support_agent.config import Settings
-from support_agent.services import AssistService, WeightedLexicalRetriever
+from support_agent.services import (
+    AssistService,
+    RecommendationLifecycleService,
+    WeightedLexicalRetriever,
+)
 
 
 def create_app(
@@ -33,9 +38,13 @@ def create_app(
             reference_date=resolved_settings.freshness_reference_date,
             freshness_max_age_days=resolved_settings.freshness_max_age_days,
         )
-    application.state.assist_service = assist_service
+    application.state.lifecycle_service = RecommendationLifecycleService(
+        assist_service,
+        InMemoryLifecycleRepository(),
+    )
     application.include_router(health_router)
     application.include_router(assist_router)
+    application.include_router(lifecycle_router)
     return application
 
 
