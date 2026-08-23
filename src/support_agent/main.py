@@ -2,11 +2,17 @@
 
 from fastapi import FastAPI
 
+from support_agent.adapters import JsonKnowledgeRepository
+from support_agent.api.routes.assist import router as assist_router
 from support_agent.api.routes.health import router as health_router
 from support_agent.config import Settings
+from support_agent.services import AssistService, WeightedLexicalRetriever
 
 
-def create_app(settings: Settings | None = None) -> FastAPI:
+def create_app(
+    settings: Settings | None = None,
+    assist_service: AssistService | None = None,
+) -> FastAPI:
     """Create the application with explicit, testable dependencies."""
 
     resolved_settings = settings or Settings.from_environment()
@@ -19,9 +25,18 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         ),
     )
     application.state.settings = resolved_settings
+    if assist_service is None:
+        repository = JsonKnowledgeRepository.from_path(resolved_settings.knowledge_path)
+        assist_service = AssistService(
+            repository,
+            WeightedLexicalRetriever(repository),
+            reference_date=resolved_settings.freshness_reference_date,
+            freshness_max_age_days=resolved_settings.freshness_max_age_days,
+        )
+    application.state.assist_service = assist_service
     application.include_router(health_router)
+    application.include_router(assist_router)
     return application
 
 
 app = create_app()
-

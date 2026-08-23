@@ -2,7 +2,7 @@
 
 Enterprise AI Support Agent is an auditable IT support decision-support PoC. It will retrieve relevant knowledge, propose grounded responses and next actions, evaluate risk, and hold actions for human approval.
 
-Phase 4 provides the FastAPI foundation, strict domain models, fictional evaluation data, a validated JSON knowledge repository, and an explainable deterministic Top-3 retriever. It intentionally does not implement the `/assist` workflow yet.
+Phase 5 provides the first end-to-end, deterministic `/assist` workflow: incident classification, explainable Top-3 retrieval, grounded recommendation or explicit abstention, safety evaluation, confidence, and mandatory human approval.
 
 ## Requirements
 
@@ -21,7 +21,7 @@ Optional local configuration:
 cp .env.example .env
 ```
 
-No API key is required for Phase 1.
+No API key is required for Phase 5.
 
 ## Run
 
@@ -35,7 +35,7 @@ Open the API documentation at <http://127.0.0.1:8000/docs> or verify health:
 curl http://127.0.0.1:8000/health
 ```
 
-Expected response:
+Expected health response:
 
 ```json
 {
@@ -45,6 +45,22 @@ Expected response:
   "environment": "development"
 }
 ```
+
+Submit a demo incident to the assistance workflow:
+
+```bash
+curl -s http://127.0.0.1:8000/assist \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "incident_id": "INC-LIVE-001",
+    "short_description": "VPN account locked after repeated sign-in attempts",
+    "description": "The corporate VPN reports that the account is locked.",
+    "category": "access",
+    "priority": "P3"
+  }'
+```
+
+The assistance response includes classification, recommendation or abstention, Top-3 evidence, evaluation signals, confidence, and approval state. It always remains `pending_approval`; Phase 5 does not execute changes.
 
 ## Test and lint
 
@@ -73,7 +89,7 @@ enterprise-ai-support-agent/
 └── pyproject.toml
 ```
 
-The empty `adapters`, `domain`, and `services` packages are intentional architecture boundaries for later phases.
+The `adapters`, `domain`, and `services` packages keep infrastructure, business rules, and workflows separate.
 
 ## Implemented phases
 
@@ -119,9 +135,20 @@ The empty `adapters`, `domain`, and `services` packages are intentional architec
 - [x] Top-1, Top-3 recall, and no-match evaluation metrics
 - [x] Command-line retrieval inspection
 
+### Phase 5 — Deterministic assistance workflow
+
+- [x] Rule-based classification with provided/inferred provenance
+- [x] `POST /assist` with a typed OpenAPI contract
+- [x] Grounded recommendation from published, current knowledge
+- [x] Explicit abstention for missing, ambiguous, or stale evidence
+- [x] Freshness, context, grounding, and high-risk evaluation signals
+- [x] Evidence-derived confidence
+- [x] Mandatory `pending_approval` state with no execution side effects
+- [x] Gold-case workflow and HTTP contract tests
+
 ## Next phase
 
-Phase 5 will add incident classification and the first `POST /assist` workflow using deterministic recommendation generation, evaluation, confidence, and `pending_approval` output.
+Phase 6 will add approval and rejection transitions plus an append-only audit trail and mock execution boundary.
 
 ## Inspect Phase 4 retrieval
 
