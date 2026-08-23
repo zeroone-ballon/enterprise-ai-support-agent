@@ -19,6 +19,13 @@ class Settings:
     knowledge_path: Path = Path(__file__).resolve().parents[2] / "data" / "knowledge.json"
     freshness_reference_date: date = date(2026, 8, 23)
     freshness_max_age_days: int = 365
+    lifecycle_db_path: Path = Path(__file__).resolve().parents[2] / "data" / "support_agent.db"
+    reviewer_api_key: str = "dev-reviewer-key"
+    reviewer_actor: str = "service-desk-lead"
+    executor_api_key: str = "dev-executor-key"
+    executor_actor: str = "automation-operator"
+    auditor_api_key: str = "dev-auditor-key"
+    auditor_actor: str = "audit-reader"
 
     @classmethod
     def from_environment(cls) -> "Settings":
@@ -40,4 +47,13 @@ class Settings:
             freshness_max_age_days=int(
                 os.getenv("FRESHNESS_MAX_AGE_DAYS", defaults.freshness_max_age_days)
             ),
+            lifecycle_db_path=Path(
+                os.getenv("LIFECYCLE_DB_PATH", defaults.lifecycle_db_path)
+            ),
+            reviewer_api_key=os.getenv("REVIEWER_API_KEY", defaults.reviewer_api_key),
+            reviewer_actor=os.getenv("REVIEWER_ACTOR", defaults.reviewer_actor),
+            executor_api_key=os.getenv("EXECUTOR_API_KEY", defaults.executor_api_key),
+            executor_actor=os.getenv("EXECUTOR_ACTOR", defaults.executor_actor),
+            auditor_api_key=os.getenv("AUDITOR_API_KEY", defaults.auditor_api_key),
+            auditor_actor=os.getenv("AUDITOR_ACTOR", defaults.auditor_actor),
         )

@@ -2,7 +2,7 @@
 
 from fastapi import FastAPI
 
-from support_agent.adapters import InMemoryLifecycleRepository, JsonKnowledgeRepository
+from support_agent.adapters import JsonKnowledgeRepository, SqliteLifecycleRepository
 from support_agent.api.routes.assist import router as assist_router
 from support_agent.api.routes.health import router as health_router
 from support_agent.api.routes.lifecycle import router as lifecycle_router
@@ -40,7 +40,7 @@ def create_app(
         )
     application.state.lifecycle_service = RecommendationLifecycleService(
         assist_service,
-        InMemoryLifecycleRepository(),
+        SqliteLifecycleRepository(resolved_settings.lifecycle_db_path),
     )
     application.include_router(health_router)
     application.include_router(assist_router)

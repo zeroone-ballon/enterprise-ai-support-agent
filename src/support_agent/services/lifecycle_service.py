@@ -137,8 +137,14 @@ class RecommendationLifecycleService:
         self,
         recommendation_id: str,
         request: ExecutionRequest,
+        *,
+        idempotency_key: str,
     ) -> ExecutionResult:
         with self._lock:
+            previous = self._repository.get_execution(recommendation_id, idempotency_key)
+            if previous is not None:
+                return previous
+
             response = self._repository.get(recommendation_id)
             if response.approval.status is not ApprovalStatus.APPROVED:
                 raise InvalidTransitionError("mock execution requires approved status")
@@ -159,7 +165,9 @@ class RecommendationLifecycleService:
                 request.executor,
                 {"side_effects": "false"},
             )
-            return ExecutionResult(recommendation=updated, receipt=receipt)
+            result = ExecutionResult(recommendation=updated, receipt=receipt)
+            self._repository.save_execution(recommendation_id, idempotency_key, result)
+            return result
 
     def audit(self, recommendation_id: str) -> list[AuditEvent]:
         return self._repository.list_events(recommendation_id)

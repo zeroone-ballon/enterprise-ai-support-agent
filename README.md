@@ -2,7 +2,7 @@
 
 Enterprise AI Support Agent is an auditable IT support decision-support PoC. It will retrieve relevant knowledge, propose grounded responses and next actions, evaluate risk, and hold actions for human approval.
 
-Phase 6 adds a controlled human-approval lifecycle to the deterministic assistance workflow. Recommendations can be approved or rejected, approved recommendations can cross only a mock-execution boundary, and every accepted transition is recorded in an append-only audit history.
+Phase 7 makes the controlled lifecycle durable and authenticated. SQLite preserves recommendations and audit history across restarts, role-specific API keys protect lifecycle operations, and idempotency keys prevent duplicate mock executions.
 
 ## Requirements
 
@@ -19,9 +19,12 @@ Optional local configuration:
 
 ```bash
 cp .env.example .env
+set -a
+source .env
+set +a
 ```
 
-No API key is required for Phase 6.
+`POST /assist` remains API-key-free for the local demo. Recommendation review, execution, retrieval, and audit endpoints require the Phase 7 role keys. Replace all development keys outside local demonstration.
 
 ## Run
 
@@ -67,16 +70,20 @@ Approve and safely simulate execution using the returned recommendation ID:
 ```bash
 curl -s http://127.0.0.1:8000/recommendations/REC-INC-LIVE-001/approve \
   -H 'Content-Type: application/json' \
+  -H 'X-API-Key: dev-reviewer-key' \
   -d '{"reviewer":"service-desk-lead","reason":"Evidence verified"}'
 
 curl -s http://127.0.0.1:8000/recommendations/REC-INC-LIVE-001/execute \
   -H 'Content-Type: application/json' \
+  -H 'X-API-Key: dev-executor-key' \
+  -H 'Idempotency-Key: demo-execution-001' \
   -d '{"executor":"automation-operator"}'
 
-curl -s http://127.0.0.1:8000/recommendations/REC-INC-LIVE-001/audit
+curl -s http://127.0.0.1:8000/recommendations/REC-INC-LIVE-001/audit \
+  -H 'X-API-Key: dev-auditor-key'
 ```
 
-The execution receipt always reports `"status":"simulated"` and `"side_effects":false`. Phase 6 state is intentionally in memory and resets when the application process restarts.
+The execution receipt always reports `"status":"simulated"` and `"side_effects":false`. Repeating execution with the same `Idempotency-Key` returns the original result without adding another audit event. SQLite state remains available after the application restarts.
 
 ## Test and lint
 
@@ -175,9 +182,21 @@ The `adapters`, `domain`, and `services` packages keep infrastructure, business 
 - [x] Simulation receipt proving no external side effects
 - [x] HTTP 404, 409, and 422 error contracts
 
+### Phase 7 — Durable, authenticated, idempotent lifecycle
+
+- [x] SQLite persistence for recommendations and ordered audit events
+- [x] State restoration after application restart
+- [x] Reviewer, executor, and auditor API-key roles
+- [x] Authenticated actor and request actor consistency checks
+- [x] HTTP 401 and 403 authorization contracts
+- [x] Required execution `Idempotency-Key`
+- [x] Persistent idempotent execution results across restarts
+- [x] Duplicate retries return the original receipt without duplicate audit events
+- [x] SQLite and execution adapters remain behind domain ports
+
 ## Next phase
 
-Phase 7 can replace in-memory lifecycle state with durable persistence, add identity and authorization, and introduce an idempotent external-system adapter sandbox.
+Phase 8 can add database migrations, hashed credential storage or OIDC, and a sandboxed ServiceNow-compatible adapter with contract tests.
 
 ## Inspect Phase 4 retrieval
 

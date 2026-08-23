@@ -8,6 +8,7 @@ from support_agent.domain.knowledge import Evidence, KnowledgeArticle
 from support_agent.domain.lifecycle import (
     AuditEvent,
     ExecutionRequest,
+    ExecutionResult,
     MockExecutionReceipt,
 )
 from support_agent.domain.response import AssistResponse
@@ -42,6 +43,19 @@ class LifecycleRepository(Protocol):
     def append_event(self, event: AuditEvent) -> None: ...
 
     def list_events(self, recommendation_id: str) -> list[AuditEvent]: ...
+
+    def get_execution(
+        self,
+        recommendation_id: str,
+        idempotency_key: str,
+    ) -> ExecutionResult | None: ...
+
+    def save_execution(
+        self,
+        recommendation_id: str,
+        idempotency_key: str,
+        result: ExecutionResult,
+    ) -> None: ...
 
 
 class ExecutionPort(Protocol):
