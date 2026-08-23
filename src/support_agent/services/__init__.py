@@ -1,6 +1,11 @@
 """Application services and workflows."""
 
 from support_agent.services.assist_service import AssistService
+from support_agent.services.generation_service import (
+    DeterministicRecommendationGenerator,
+    GenerationCoordinator,
+    GenerationGuardrail,
+)
 from support_agent.services.incident_classifier import RuleBasedIncidentClassifier
 from support_agent.services.lexical_retriever import RetrievalConfig, WeightedLexicalRetriever
 from support_agent.services.lifecycle_service import (
@@ -12,6 +17,9 @@ from support_agent.services.retrieval_evaluation import RetrievalMetrics, evalua
 
 __all__ = [
     "AssistService",
+    "DeterministicRecommendationGenerator",
+    "GenerationCoordinator",
+    "GenerationGuardrail",
     "InvalidTransitionError",
     "MockExecutor",
     "RecommendationLifecycleService",

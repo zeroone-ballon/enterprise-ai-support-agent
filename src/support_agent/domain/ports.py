@@ -3,6 +3,7 @@
 from datetime import datetime
 from typing import Protocol
 
+from support_agent.domain.generation import GeneratedDraft
 from support_agent.domain.incident import Incident
 from support_agent.domain.knowledge import Evidence, KnowledgeArticle
 from support_agent.domain.lifecycle import (
@@ -67,3 +68,16 @@ class ExecutionPort(Protocol):
         request: ExecutionRequest,
         executed_at: datetime,
     ) -> MockExecutionReceipt: ...
+
+
+class RecommendationGenerationPort(Protocol):
+    """Generate a strict recommendation draft from an incident and grounded knowledge."""
+
+    provider_name: str
+
+    def generate(
+        self,
+        incident: Incident,
+        article: KnowledgeArticle,
+        evidence: list[Evidence],
+    ) -> GeneratedDraft: ...

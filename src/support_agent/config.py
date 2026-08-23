@@ -1,7 +1,7 @@
 """Application configuration with safe, API-key-free defaults."""
 
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
 
@@ -32,6 +32,11 @@ class Settings:
         "46151c35c1c09bca0b049ce55099e4f67fd04efe91716eec70fd1fa8ce898163"
     )
     auditor_actor: str = "audit-reader"
+    generation_mode: str = "deterministic"
+    llm_base_url: str = ""
+    llm_api_key: str = field(default="", repr=False)
+    llm_model: str = ""
+    llm_timeout_seconds: float = 20.0
 
     @classmethod
     def from_environment(cls) -> "Settings":
@@ -68,4 +73,11 @@ class Settings:
                 "AUDITOR_API_KEY_SHA256", defaults.auditor_api_key_sha256
             ),
             auditor_actor=os.getenv("AUDITOR_ACTOR", defaults.auditor_actor),
+            generation_mode=os.getenv("GENERATION_MODE", defaults.generation_mode).casefold(),
+            llm_base_url=os.getenv("LLM_BASE_URL", defaults.llm_base_url),
+            llm_api_key=os.getenv("LLM_API_KEY", defaults.llm_api_key),
+            llm_model=os.getenv("LLM_MODEL", defaults.llm_model),
+            llm_timeout_seconds=float(
+                os.getenv("LLM_TIMEOUT_SECONDS", defaults.llm_timeout_seconds)
+            ),
         )

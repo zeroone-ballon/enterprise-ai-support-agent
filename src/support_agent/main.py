@@ -4,8 +4,11 @@ from fastapi import FastAPI
 
 from support_agent.adapters import (
     JsonKnowledgeRepository,
+    OpenAICompatibleGenerator,
+    OpenAICompatibleHttpTransport,
     ServiceNowSandboxExecutor,
     SqliteLifecycleRepository,
+    UnavailableGenerator,
 )
 from support_agent.api.routes.assist import router as assist_router
 from support_agent.api.routes.health import router as health_router
@@ -13,6 +16,7 @@ from support_agent.api.routes.lifecycle import router as lifecycle_router
 from support_agent.config import Settings
 from support_agent.services import (
     AssistService,
+    GenerationCoordinator,
     RecommendationLifecycleService,
     WeightedLexicalRetriever,
 )
@@ -36,11 +40,34 @@ def create_app(
     application.state.settings = resolved_settings
     if assist_service is None:
         repository = JsonKnowledgeRepository.from_path(resolved_settings.knowledge_path)
+        if resolved_settings.generation_mode == "deterministic":
+            primary_generator = None
+        elif resolved_settings.generation_mode == "llm":
+            if all(
+                (
+                    resolved_settings.llm_base_url,
+                    resolved_settings.llm_api_key,
+                    resolved_settings.llm_model,
+                )
+            ):
+                primary_generator = OpenAICompatibleGenerator(
+                    OpenAICompatibleHttpTransport(
+                        resolved_settings.llm_base_url,
+                        resolved_settings.llm_api_key,
+                        resolved_settings.llm_model,
+                        timeout_seconds=resolved_settings.llm_timeout_seconds,
+                    )
+                )
+            else:
+                primary_generator = UnavailableGenerator()
+        else:
+            raise ValueError("GENERATION_MODE must be deterministic or llm")
         assist_service = AssistService(
             repository,
             WeightedLexicalRetriever(repository),
             reference_date=resolved_settings.freshness_reference_date,
             freshness_max_age_days=resolved_settings.freshness_max_age_days,
+            generation=GenerationCoordinator(primary_generator),
         )
     lifecycle_repository = SqliteLifecycleRepository(resolved_settings.lifecycle_db_path)
     application.state.lifecycle_service = RecommendationLifecycleService(

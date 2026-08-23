@@ -2,7 +2,7 @@
 
 Enterprise AI Support Agent is an auditable IT support decision-support PoC. It will retrieve relevant knowledge, propose grounded responses and next actions, evaluate risk, and hold actions for human approval.
 
-Phase 8 hardens the integration boundary. Versioned SQLite migrations preserve existing Phase 7 data, only API-key hashes are configured, and approved actions are translated into a ServiceNow-compatible sandbox outbox without making an HTTP request.
+Phase 9 adds an optional structured LLM generation boundary while keeping deterministic behavior as the default. Provider failures, invalid JSON, unsupported citations, insufficient grounding, unsafe instructions, and high-risk incidents all fail closed to the evidence-derived deterministic response.
 
 ## Requirements
 
@@ -25,6 +25,8 @@ set +a
 ```
 
 `POST /assist` remains API-key-free for the local demo. Recommendation review, execution, retrieval, and audit endpoints require role keys. The server stores only SHA-256 digests; replace all development credentials outside local demonstration.
+
+The default `GENERATION_MODE=deterministic` requires no LLM key and makes no provider call. Optional OpenAI-compatible generation is enabled only when `GENERATION_MODE=llm`, `LLM_BASE_URL`, `LLM_MODEL`, and `LLM_API_KEY` are all configured.
 
 ## Run
 
@@ -64,6 +66,19 @@ curl -s http://127.0.0.1:8000/assist \
 ```
 
 The assistance response includes classification, recommendation or abstention, Top-3 evidence, evaluation signals, confidence, and approval state. It starts as `pending_approval` and never performs an external action.
+
+Phase 9 also exposes generation provenance:
+
+```json
+{
+  "generation": {
+    "mode": "deterministic",
+    "provider": "deterministic",
+    "fallback_used": false,
+    "violations": []
+  }
+}
+```
 
 Approve and safely simulate execution using the returned recommendation ID:
 
@@ -206,11 +221,24 @@ The `adapters`, `domain`, and `services` packages keep infrastructure, business 
 - [x] No ServiceNow URL, credential, or network call
 - [x] Contract and migration regression tests
 
+### Phase 9 — Structured LLM generation and guardrails
+
+- [x] Provider-neutral structured recommendation-generation port
+- [x] Deterministic generation remains the API-key-free default
+- [x] Optional OpenAI-compatible chat-completions adapter
+- [x] Strict Pydantic validation of provider JSON
+- [x] Allowed evidence citation enforcement
+- [x] Minimum lexical grounding against approved knowledge
+- [x] Explicit unsafe-instruction rejection
+- [x] LLM generation disabled for high-risk incidents
+- [x] Provider timeout, malformed response, and configuration fallback
+- [x] Generation mode, provider, fallback, and violation provenance
+- [x] Provider incident and knowledge content treated as untrusted data
+
 ## Next phase
 
 ## Remaining roadmap
 
-- **Phase 9:** optional LLM provider boundary, structured generation, grounding guardrails, and deterministic fallback
 - **Phase 10:** evaluation report, observability, containerization, CI, and deployment hardening
 - **Phase 11:** final end-to-end demo, architecture and threat-model documentation, portfolio packaging, and release candidate
 

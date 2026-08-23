@@ -7,6 +7,7 @@ from pydantic import Field, model_validator
 from support_agent.domain.approval import Approval
 from support_agent.domain.base import DomainModel
 from support_agent.domain.common import KnowledgeStatus, RecommendationStatus
+from support_agent.domain.generation import GenerationMetadata
 from support_agent.domain.incident import IncidentClassification, IncidentId
 from support_agent.domain.knowledge import Evidence
 from support_agent.domain.recommendation import Evaluation, Recommendation
@@ -28,6 +29,7 @@ class AssistResponse(DomainModel):
     evaluation: Evaluation
     confidence: Annotated[float, Field(ge=0.0, le=1.0)]
     approval: Approval
+    generation: GenerationMetadata = Field(default_factory=GenerationMetadata)
 
     @model_validator(mode="after")
     def validate_grounding_contract(self) -> Self:

@@ -8,6 +8,7 @@ from support_agent.domain.common import (
     Priority,
     RecommendationStatus,
 )
+from support_agent.domain.generation import GeneratedDraft, GenerationMetadata
 from support_agent.domain.incident import Incident, IncidentClassification
 from support_agent.domain.knowledge import Evidence, KnowledgeArticle
 from support_agent.domain.lifecycle import (
@@ -35,6 +36,8 @@ __all__ = [
     "Evidence",
     "ExecutionRequest",
     "ExecutionResult",
+    "GeneratedDraft",
+    "GenerationMetadata",
     "Incident",
     "IncidentClassification",
     "KnowledgeArticle",

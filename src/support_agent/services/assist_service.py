@@ -7,11 +7,13 @@ from support_agent.domain import (
     AssistResponse,
     Evaluation,
     Evidence,
+    GenerationMetadata,
     Incident,
     Recommendation,
     RecommendationStatus,
 )
 from support_agent.domain.ports import KnowledgeRepository, Retriever
+from support_agent.services.generation_service import GenerationCoordinator
 from support_agent.services.incident_classifier import RuleBasedIncidentClassifier
 from support_agent.services.lexical_retriever import tokenize
 
@@ -30,12 +32,14 @@ class AssistService:
         *,
         reference_date: date,
         freshness_max_age_days: int = 365,
+        generation: GenerationCoordinator | None = None,
     ) -> None:
         self._repository = repository
         self._retriever = retriever
         self._classifier = RuleBasedIncidentClassifier()
         self._reference_date = reference_date
         self._freshness_max_age_days = freshness_max_age_days
+        self._generation = generation or GenerationCoordinator()
 
     def assist(self, incident: Incident) -> AssistResponse:
         """Build an auditable recommendation or explicit abstention."""
@@ -65,17 +69,23 @@ class AssistService:
             )
         )
         can_recommend = bool(top_evidence and article and knowledge_fresh and sufficient_context)
+        generation_metadata = GenerationMetadata()
 
         if can_recommend:
+            outcome = self._generation.generate(
+                classified_incident,
+                article,
+                evidence,
+                allow_primary=not high_risk,
+            )
+            draft = outcome.draft
             recommendation = Recommendation(
                 status=RecommendationStatus.RECOMMENDED,
-                summary=f"Use {article.knowledge_id}: {article.title}",
-                suggested_response=article.content,
-                next_actions=[
-                    "Review the cited evidence and proposed response.",
-                    "Approve or reject the recommendation before any action is taken.",
-                ],
+                summary=draft.summary,
+                suggested_response=draft.suggested_response,
+                next_actions=draft.next_actions,
             )
+            generation_metadata = outcome.metadata
             confidence = top_evidence.score
         else:
             recommendation = self._abstention(top_evidence, knowledge_fresh, sufficient_context)
@@ -92,10 +102,11 @@ class AssistService:
                 knowledge_fresh=knowledge_fresh,
                 sufficient_context=sufficient_context,
                 high_risk_action=high_risk,
-                violations=[],
+                violations=generation_metadata.violations,
             ),
             confidence=confidence,
             approval=Approval(),
+            generation=generation_metadata,
         )
 
     @staticmethod

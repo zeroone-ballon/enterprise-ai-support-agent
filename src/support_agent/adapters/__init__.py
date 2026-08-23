@@ -11,6 +11,11 @@ from support_agent.adapters.lifecycle_errors import (
     DuplicateRecommendationError,
     RecommendationNotFoundError,
 )
+from support_agent.adapters.openai_compatible_generator import (
+    OpenAICompatibleGenerator,
+    OpenAICompatibleHttpTransport,
+    UnavailableGenerator,
+)
 from support_agent.adapters.servicenow_sandbox_executor import ServiceNowSandboxExecutor
 from support_agent.adapters.sqlite_lifecycle_repository import SqliteLifecycleRepository
 
@@ -19,7 +24,10 @@ __all__ = [
     "InMemoryLifecycleRepository",
     "JsonKnowledgeRepository",
     "KnowledgeDataError",
+    "OpenAICompatibleGenerator",
+    "OpenAICompatibleHttpTransport",
     "RecommendationNotFoundError",
     "SqliteLifecycleRepository",
     "ServiceNowSandboxExecutor",
+    "UnavailableGenerator",
 ]
