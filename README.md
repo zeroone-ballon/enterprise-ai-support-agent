@@ -2,19 +2,17 @@
 
 Enterprise AI Support Agent is an auditable IT support decision-support PoC. It will retrieve relevant knowledge, propose grounded responses and next actions, evaluate risk, and hold actions for human approval.
 
-Phase 1 provides the FastAPI application foundation and health endpoint. It intentionally does not implement incident assistance yet.
+Phase 2 provides the FastAPI foundation plus strict domain models for incident intake, knowledge evidence, recommendation, evaluation, and human approval. It intentionally does not implement retrieval or the `/assist` workflow yet.
 
 ## Requirements
 
 - Python 3.11 or later
 
-## Setup
+## Setup with uv
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -e ".[dev]"
+uv python install 3.12
+uv sync --extra dev
 ```
 
 Optional local configuration:
@@ -28,7 +26,7 @@ No API key is required for Phase 1.
 ## Run
 
 ```bash
-uvicorn support_agent.main:app --reload
+uv run uvicorn support_agent.main:app --reload
 ```
 
 Open the API documentation at <http://127.0.0.1:8000/docs> or verify health:
@@ -51,8 +49,8 @@ Expected response:
 ## Test and lint
 
 ```bash
-pytest
-ruff check .
+uv run pytest
+uv run ruff check .
 ```
 
 ## Project structure
@@ -68,12 +66,16 @@ enterprise-ai-support-agent/
 │   └── main.py          # FastAPI application factory
 ├── tests/
 ├── .env.example
+├── .python-version
+├── uv.lock
 └── pyproject.toml
 ```
 
 The empty `adapters`, `domain`, and `services` packages are intentional architecture boundaries for later phases.
 
-## Phase 1 acceptance criteria
+## Implemented phases
+
+### Phase 1 — Application foundation
 
 - [x] Installable `src`-layout Python project
 - [x] FastAPI application factory
@@ -83,7 +85,17 @@ The empty `adapters`, `domain`, and `services` packages are intentional architec
 - [x] API-key-free startup
 - [x] Reproducible setup, run, test, and lint commands
 
+### Phase 2 — Domain model
+
+- [x] Strict incident intake and classification models
+- [x] Knowledge lifecycle and evidence models
+- [x] Recommendation and explicit abstention models
+- [x] Evaluation signals
+- [x] Human approval audit metadata
+- [x] Aggregate `AssistResponse`
+- [x] Cross-model grounding and confidence invariants
+- [x] Automated validation tests
+
 ## Next phase
 
-Phase 2 will add the `Incident`, `KnowledgeArticle`, `Evidence`, `Recommendation`, `Approval`, and `AssistResponse` domain models defined in the Phase 0 specification.
-
+Phase 3 will add fictional JSON incident and knowledge datasets, including successful, ambiguous, insufficient-context, missing-knowledge, stale-knowledge, and high-risk cases.
