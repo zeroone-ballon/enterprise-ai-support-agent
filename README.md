@@ -2,7 +2,7 @@
 
 Enterprise AI Support Agent is an auditable IT support decision-support PoC. It will retrieve relevant knowledge, propose grounded responses and next actions, evaluate risk, and hold actions for human approval.
 
-Phase 3 provides the FastAPI foundation, strict domain models, and a fictional evaluation dataset for incident classification, knowledge retrieval, abstention, freshness, and risk behavior. It intentionally does not implement retrieval or the `/assist` workflow yet.
+Phase 4 provides the FastAPI foundation, strict domain models, fictional evaluation data, a validated JSON knowledge repository, and an explainable deterministic Top-3 retriever. It intentionally does not implement the `/assist` workflow yet.
 
 ## Requirements
 
@@ -108,6 +108,25 @@ The empty `adapters`, `domain`, and `services` packages are intentional architec
 - [x] Deterministic freshness reference date
 - [x] Automated fixture and reference-integrity tests
 
+### Phase 4 — JSON repository and retriever
+
+- [x] Domain-facing `KnowledgeRepository` and `Retriever` contracts
+- [x] Strict UTF-8 JSON repository with duplicate and validation checks
+- [x] Draft and retired article exclusion
+- [x] Weighted title, tag, content, and category scoring
+- [x] Explainable matched terms and bounded scores
+- [x] Deterministic Top-3 ordering and configurable threshold
+- [x] Top-1, Top-3 recall, and no-match evaluation metrics
+- [x] Command-line retrieval inspection
+
 ## Next phase
 
-Phase 4 will add a JSON knowledge repository and an explainable deterministic retriever with weighted title, tag, and content matching, publication filtering, and Top-3 results.
+Phase 5 will add incident classification and the first `POST /assist` workflow using deterministic recommendation generation, evaluation, confidence, and `pending_approval` output.
+
+## Inspect Phase 4 retrieval
+
+```bash
+uv run python -m support_agent.cli INC-DEMO-001
+```
+
+The command prints up to three ranked `Evidence` objects with the article ID, score, matched terms, publication state, and update date.
