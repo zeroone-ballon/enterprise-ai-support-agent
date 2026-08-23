@@ -182,4 +182,3 @@ class WeightedLexicalRetriever:
         """Measure how much of the incident vocabulary a field explains."""
 
         return len(overlap) / len(query_terms)
-

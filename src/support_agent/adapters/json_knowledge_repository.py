@@ -51,13 +51,10 @@ class JsonKnowledgeRepository:
         """Exclude draft and retired articles from recommendation evidence."""
 
         return tuple(
-            article
-            for article in self._articles
-            if article.status is KnowledgeStatus.PUBLISHED
+            article for article in self._articles if article.status is KnowledgeStatus.PUBLISHED
         )
 
     def get(self, knowledge_id: str) -> KnowledgeArticle | None:
         """Return an article regardless of publication state for administration."""
 
         return self._by_id.get(knowledge_id)
-

@@ -57,4 +57,3 @@ class Evidence(DomainModel):
 
         normalized = [term.casefold() for term in terms]
         return list(dict.fromkeys(normalized))
-

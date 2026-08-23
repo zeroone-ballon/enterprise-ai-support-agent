@@ -41,4 +41,3 @@ class Evaluation(DomainModel):
         default_factory=list,
         max_length=50,
     )
-

@@ -14,6 +14,7 @@ from support_agent.api.routes.assist import router as assist_router
 from support_agent.api.routes.health import router as health_router
 from support_agent.api.routes.lifecycle import router as lifecycle_router
 from support_agent.config import Settings
+from support_agent.observability import configure_observability
 from support_agent.services import (
     AssistService,
     GenerationCoordinator,
@@ -29,6 +30,7 @@ def create_app(
     """Create the application with explicit, testable dependencies."""
 
     resolved_settings = settings or Settings.from_environment()
+    resolved_settings.validate_for_startup()
     application = FastAPI(
         title=resolved_settings.app_name,
         version=resolved_settings.app_version,
@@ -38,6 +40,7 @@ def create_app(
         ),
     )
     application.state.settings = resolved_settings
+    configure_observability(application, resolved_settings.log_level)
     if assist_service is None:
         repository = JsonKnowledgeRepository.from_path(resolved_settings.knowledge_path)
         if resolved_settings.generation_mode == "deterministic":

@@ -27,4 +27,3 @@ class IncidentClassification(DomainModel):
     category: Category
     priority: Priority
     source: ClassificationSource
-

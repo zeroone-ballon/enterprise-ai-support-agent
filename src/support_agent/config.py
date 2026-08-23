@@ -28,15 +28,30 @@ class Settings:
         "8a059a3e30ba84bd7b957c156d42b3e4cb5d61bf5712de83ebdd956c06e1204a"
     )
     executor_actor: str = "automation-operator"
-    auditor_api_key_sha256: str = (
-        "46151c35c1c09bca0b049ce55099e4f67fd04efe91716eec70fd1fa8ce898163"
-    )
+    auditor_api_key_sha256: str = "46151c35c1c09bca0b049ce55099e4f67fd04efe91716eec70fd1fa8ce898163"
     auditor_actor: str = "audit-reader"
     generation_mode: str = "deterministic"
     llm_base_url: str = ""
     llm_api_key: str = field(default="", repr=False)
     llm_model: str = ""
     llm_timeout_seconds: float = 20.0
+
+    def validate_for_startup(self) -> None:
+        """Reject insecure production settings while preserving local demo defaults."""
+
+        if self.app_env.casefold() == "production":
+            development_digests = {
+                type(self)().reviewer_api_key_sha256,
+                type(self)().executor_api_key_sha256,
+                type(self)().auditor_api_key_sha256,
+            }
+            configured = {
+                self.reviewer_api_key_sha256,
+                self.executor_api_key_sha256,
+                self.auditor_api_key_sha256,
+            }
+            if configured & development_digests:
+                raise ValueError("development API-key digests are forbidden in production")
 
     @classmethod
     def from_environment(cls) -> "Settings":
@@ -58,9 +73,7 @@ class Settings:
             freshness_max_age_days=int(
                 os.getenv("FRESHNESS_MAX_AGE_DAYS", defaults.freshness_max_age_days)
             ),
-            lifecycle_db_path=Path(
-                os.getenv("LIFECYCLE_DB_PATH", defaults.lifecycle_db_path)
-            ),
+            lifecycle_db_path=Path(os.getenv("LIFECYCLE_DB_PATH", defaults.lifecycle_db_path)),
             reviewer_api_key_sha256=os.getenv(
                 "REVIEWER_API_KEY_SHA256", defaults.reviewer_api_key_sha256
             ),

@@ -187,9 +187,7 @@ def test_grounded_assist_response_requires_published_evidence() -> None:
     assert response.approval.status is ApprovalStatus.PENDING
     assert response.model_dump(mode="json")["confidence"] == 0.82
 
-    retired_evidence = make_evidence().model_copy(
-        update={"status": KnowledgeStatus.RETIRED}
-    )
+    retired_evidence = make_evidence().model_copy(update={"status": KnowledgeStatus.RETIRED})
     with pytest.raises(ValidationError, match="requires published evidence"):
         AssistResponse(
             **{

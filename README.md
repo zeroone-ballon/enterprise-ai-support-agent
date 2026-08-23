@@ -2,7 +2,9 @@
 
 Enterprise AI Support Agent is an auditable IT support decision-support PoC. It will retrieve relevant knowledge, propose grounded responses and next actions, evaluate risk, and hold actions for human approval.
 
-Phase 9 adds an optional structured LLM generation boundary while keeping deterministic behavior as the default. Provider failures, invalid JSON, unsupported citations, insufficient grounding, unsafe instructions, and high-risk incidents all fail closed to the evidence-derived deterministic response.
+Phase 10 adds reproducible evaluation, sanitized observability, readiness checks, a non-root
+container, CI quality gates, and production-startup credential hardening. The optional structured
+LLM boundary remains fail-closed, while deterministic behavior stays the default.
 
 ## Requirements
 
@@ -39,6 +41,16 @@ Open the API documentation at <http://127.0.0.1:8000/docs> or verify health:
 ```bash
 curl http://127.0.0.1:8000/health
 ```
+
+Readiness and sanitized process metrics are available separately:
+
+```bash
+curl -i http://127.0.0.1:8000/ready
+curl -s http://127.0.0.1:8000/metrics
+```
+
+Responses carry an `X-Request-ID`. Request logs contain method, route template, status, duration,
+and request ID, but never headers, request bodies, incident text, knowledge text, or credentials.
 
 Expected health response:
 
@@ -105,7 +117,34 @@ The execution receipt always reports `"status":"simulated"` and `"side_effects":
 ```bash
 uv run pytest
 uv run ruff check .
+uv run ruff format --check .
+uv run python -m support_agent.evaluate --output reports/evaluation.json
 ```
+
+The evaluation command checks all eight fictional gold cases and exits non-zero on any mismatch.
+The CI workflow additionally enforces at least 90% test coverage.
+
+## Container
+
+Build the non-root image:
+
+```bash
+docker build -t enterprise-ai-support-agent:phase10 .
+```
+
+The image uses `APP_ENV=production`, so it intentionally refuses to start with the bundled demo
+credential digests. Supply three separately generated SHA-256 digests and mount durable state:
+
+```bash
+docker run --rm -p 8000:8000 \
+  -v support-agent-state:/app/state \
+  -e REVIEWER_API_KEY_SHA256='<sha256>' \
+  -e EXECUTOR_API_KEY_SHA256='<sha256>' \
+  -e AUDITOR_API_KEY_SHA256='<sha256>' \
+  enterprise-ai-support-agent:phase10
+```
+
+See `docs/operations.md` for the explicit deployment boundary and platform responsibilities.
 
 ## Project structure
 
@@ -235,11 +274,20 @@ The `adapters`, `domain`, and `services` packages keep infrastructure, business 
 - [x] Generation mode, provider, fallback, and violation provenance
 - [x] Provider incident and knowledge content treated as untrusted data
 
-## Next phase
+### Phase 10 — Evaluation, observability, and deployment hardening
+
+- [x] Reproducible eight-case JSON evaluation report with non-zero failure exit
+- [x] Top-1, abstention, grounding, freshness, and high-risk metrics
+- [x] Sanitized structured request logs and propagated request IDs
+- [x] Process-local request count, failure, and latency metrics
+- [x] Separate liveness and dependency-readiness endpoints
+- [x] Production startup rejects bundled development credential digests
+- [x] Non-root container with health check and durable state boundary
+- [x] GitHub Actions lint, format, coverage, evaluation, and artifact gates
+- [x] Explicit deployment limitations and platform responsibilities
 
 ## Remaining roadmap
 
-- **Phase 10:** evaluation report, observability, containerization, CI, and deployment hardening
 - **Phase 11:** final end-to-end demo, architecture and threat-model documentation, portfolio packaging, and release candidate
 
 ## Inspect Phase 4 retrieval

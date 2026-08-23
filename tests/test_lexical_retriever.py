@@ -58,9 +58,7 @@ def test_retrieval_excludes_draft_and_retired_articles(
     retriever: WeightedLexicalRetriever,
 ) -> None:
     retrieved_ids = {
-        item.knowledge_id
-        for incident in load_incidents()
-        for item in retriever.search(incident)
+        item.knowledge_id for incident in load_incidents() for item in retriever.search(incident)
     }
 
     assert "KB-DEMO-010" not in retrieved_ids

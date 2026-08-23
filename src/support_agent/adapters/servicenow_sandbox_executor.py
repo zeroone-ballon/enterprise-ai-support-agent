@@ -40,8 +40,7 @@ class ServiceNowSandboxExecutor:
             executor=request.executor,
             executed_at=executed_at,
             summary=(
-                f"ServiceNow sandbox action {action.action_id} recorded; "
-                "no HTTP call was made."
+                f"ServiceNow sandbox action {action.action_id} recorded; no HTTP call was made."
             ),
         )
 

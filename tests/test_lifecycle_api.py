@@ -119,12 +119,10 @@ def test_duplicate_and_missing_recommendations_return_clear_errors(tmp_path: Pat
 
     assert client.post("/assist", json=payload).status_code == 200
     assert client.post("/assist", json=payload).status_code == 409
-    assert client.get(
-        "/recommendations/REC-MISSING", headers=AUDITOR_HEADERS
-    ).status_code == 404
-    assert client.get(
-        "/recommendations/REC-MISSING/audit", headers=AUDITOR_HEADERS
-    ).status_code == 404
+    assert client.get("/recommendations/REC-MISSING", headers=AUDITOR_HEADERS).status_code == 404
+    assert (
+        client.get("/recommendations/REC-MISSING/audit", headers=AUDITOR_HEADERS).status_code == 404
+    )
 
 
 def test_rejection_requires_a_reason(tmp_path: Path) -> None:

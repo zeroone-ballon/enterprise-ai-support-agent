@@ -44,4 +44,3 @@ class Approval(DomainModel):
             raise ValueError("executed_at is valid only for executed approval")
 
         return self
-

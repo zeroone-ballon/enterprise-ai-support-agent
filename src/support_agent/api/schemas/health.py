@@ -15,3 +15,12 @@ class HealthResponse(BaseModel):
     version: str
     environment: str
 
+
+class ReadinessResponse(BaseModel):
+    """Dependency readiness response."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    status: Literal["ready"]
+    knowledge: Literal["ready"]
+    database: Literal["ready"]

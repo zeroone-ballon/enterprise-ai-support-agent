@@ -41,4 +41,3 @@ class ClassificationSource(StrEnum):
 
     PROVIDED = "provided"
     INFERRED = "inferred"
-

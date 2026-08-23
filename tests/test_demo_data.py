@@ -27,9 +27,7 @@ def test_all_demo_incidents_are_unique_and_valid() -> None:
 
 
 def test_all_demo_knowledge_articles_are_unique_and_valid() -> None:
-    articles = [
-        KnowledgeArticle.model_validate(item) for item in load_json("knowledge.json")
-    ]
+    articles = [KnowledgeArticle.model_validate(item) for item in load_json("knowledge.json")]
     knowledge_ids = [article.knowledge_id for article in articles]
 
     assert 8 <= len(articles) <= 12
@@ -131,4 +129,3 @@ def test_fixtures_use_only_demo_identifiers() -> None:
     assert "@" not in serialized
     assert "http://" not in serialized
     assert "https://" not in serialized
-

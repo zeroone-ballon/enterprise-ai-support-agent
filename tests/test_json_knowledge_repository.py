@@ -49,4 +49,3 @@ def test_repository_rejects_invalid_articles_and_duplicate_ids(tmp_path: Path) -
     duplicate_file.write_text(json.dumps([source[0], source[0]]), encoding="utf-8")
     with pytest.raises(KnowledgeDataError, match="IDs must be unique"):
         JsonKnowledgeRepository.from_path(duplicate_file)
-

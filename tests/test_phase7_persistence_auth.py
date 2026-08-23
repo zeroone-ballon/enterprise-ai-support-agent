@@ -40,9 +40,7 @@ def test_state_survives_app_restart_and_execution_retry_is_idempotent(tmp_path: 
     assert first_execution.status_code == 200
 
     restarted_app = TestClient(create_app(settings))
-    restored = restarted_app.get(
-        f"/recommendations/{recommendation_id}", headers=AUDITOR
-    )
+    restored = restarted_app.get(f"/recommendations/{recommendation_id}", headers=AUDITOR)
     assert restored.json()["approval"]["status"] == "executed"
 
     retry = restarted_app.post(
@@ -53,9 +51,7 @@ def test_state_survives_app_restart_and_execution_retry_is_idempotent(tmp_path: 
     assert retry.status_code == 200
     assert retry.json() == first_execution.json()
 
-    audit = restarted_app.get(
-        f"/recommendations/{recommendation_id}/audit", headers=AUDITOR
-    ).json()
+    audit = restarted_app.get(f"/recommendations/{recommendation_id}/audit", headers=AUDITOR).json()
     assert len(audit) == 3
 
 
@@ -69,11 +65,14 @@ def test_lifecycle_endpoints_enforce_credentials_roles_and_actor(tmp_path: Path)
 
     assert client.post(path, json=decision).status_code == 401
     assert client.post(path, json=decision, headers=EXECUTOR).status_code == 403
-    assert client.post(
-        path,
-        json={"reviewer": "someone-else"},
-        headers=REVIEWER,
-    ).status_code == 403
+    assert (
+        client.post(
+            path,
+            json={"reviewer": "someone-else"},
+            headers=REVIEWER,
+        ).status_code
+        == 403
+    )
 
 
 def test_execute_requires_idempotency_key(tmp_path: Path) -> None:

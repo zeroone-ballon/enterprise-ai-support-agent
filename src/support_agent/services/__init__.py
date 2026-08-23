@@ -1,6 +1,7 @@
 """Application services and workflows."""
 
 from support_agent.services.assist_service import AssistService
+from support_agent.services.evaluation_report import EvaluationReport, evaluate
 from support_agent.services.generation_service import (
     DeterministicRecommendationGenerator,
     GenerationCoordinator,
@@ -18,6 +19,7 @@ from support_agent.services.retrieval_evaluation import RetrievalMetrics, evalua
 __all__ = [
     "AssistService",
     "DeterministicRecommendationGenerator",
+    "EvaluationReport",
     "GenerationCoordinator",
     "GenerationGuardrail",
     "InvalidTransitionError",
@@ -27,5 +29,6 @@ __all__ = [
     "RetrievalMetrics",
     "RuleBasedIncidentClassifier",
     "WeightedLexicalRetriever",
+    "evaluate",
     "evaluate_retriever",
 ]

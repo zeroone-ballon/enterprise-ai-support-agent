@@ -32,4 +32,3 @@ def test_openapi_exposes_health_endpoint() -> None:
 
     assert response.status_code == 200
     assert "/health" in response.json()["paths"]
-
