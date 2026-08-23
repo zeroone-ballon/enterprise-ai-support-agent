@@ -2,9 +2,10 @@
 
 Enterprise AI Support Agent is an auditable IT support decision-support PoC. It will retrieve relevant knowledge, propose grounded responses and next actions, evaluate risk, and hold actions for human approval.
 
-Phase 10 adds reproducible evaluation, sanitized observability, readiness checks, a non-root
-container, CI quality gates, and production-startup credential hardening. The optional structured
-LLM boundary remains fail-closed, while deterministic behavior stays the default.
+Version `1.0.0rc1` completes the portfolio release candidate with a live end-to-end demo,
+architecture and threat-model documentation, a security policy, and an explicit release checklist.
+The optional structured LLM boundary remains fail-closed, while deterministic behavior stays the
+API-key-free default.
 
 ## Requirements
 
@@ -58,7 +59,7 @@ Expected health response:
 {
   "status": "ok",
   "service": "Enterprise AI Support Agent",
-  "version": "0.1.0",
+  "version": "1.0.0rc1",
   "environment": "development"
 }
 ```
@@ -123,6 +124,18 @@ uv run python -m support_agent.evaluate --output reports/evaluation.json
 
 The evaluation command checks all eight fictional gold cases and exits non-zero on any mismatch.
 The CI workflow additionally enforces at least 90% test coverage.
+
+## End-to-end release-candidate demo
+
+With the API running in one terminal, execute the complete local scenario in another:
+
+```bash
+uv run python -m support_agent.demo
+```
+
+The command verifies grounded assistance, authenticated human approval, simulated execution,
+idempotent retry, a three-event audit trail, and the absence of external side effects. See
+`docs/demo.md` for the walkthrough and `docs/portfolio.md` for a concise project narrative.
 
 ## Container
 
@@ -286,9 +299,22 @@ The `adapters`, `domain`, and `services` packages keep infrastructure, business 
 - [x] GitHub Actions lint, format, coverage, evaluation, and artifact gates
 - [x] Explicit deployment limitations and platform responsibilities
 
-## Remaining roadmap
+### Phase 11 — Release candidate and portfolio packaging
 
-- **Phase 11:** final end-to-end demo, architecture and threat-model documentation, portfolio packaging, and release candidate
+- [x] Live standard-library end-to-end demonstration command
+- [x] Final approval, execution, replay, audit, and sandbox acceptance test
+- [x] Release-candidate version exposed by health and OpenAPI
+- [x] Architecture and runtime-flow diagrams
+- [x] Threat model with residual production requirements
+- [x] Five-minute portfolio walkthrough and measured claims
+- [x] Security policy, changelog, MIT license, and release checklist
+- [x] Explicit no-side-effect and non-production-use boundaries
+
+## Release status
+
+All eleven planned phases are implemented. `1.0.0rc1` remains a portfolio release candidate rather
+than a production-certified support system. Promotion to a final release requires the checks in
+`RELEASE_CHECKLIST.md` and independent security, privacy, platform, and operational review.
 
 ## Inspect Phase 4 retrieval
 
