@@ -11,8 +11,8 @@ jobs:
   quality:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
         with:
           enable-cache: true
       - run: uv python install 3.12
@@ -21,7 +21,7 @@ jobs:
       - run: uv run ruff format --check .
       - run: uv run pytest --cov=support_agent --cov-report=term-missing --cov-fail-under=90
       - run: uv run python -m support_agent.evaluate --output reports/evaluation.json
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: evaluation-report
           path: reports/evaluation.json
