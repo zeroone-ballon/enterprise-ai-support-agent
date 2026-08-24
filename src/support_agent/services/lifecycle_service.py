@@ -161,9 +161,9 @@ class RecommendationLifecycleService:
             self._repository.save(updated)
             self._append_event(
                 recommendation_id,
-                AuditEventType.EXECUTED,
+                (AuditEventType.PDI_UPDATED if receipt.side_effects else AuditEventType.EXECUTED),
                 request.executor,
-                {"side_effects": "false"},
+                {"side_effects": str(receipt.side_effects).lower()},
             )
             result = ExecutionResult(recommendation=updated, receipt=receipt)
             self._repository.save_execution(recommendation_id, idempotency_key, result)

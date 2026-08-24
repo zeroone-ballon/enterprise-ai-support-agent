@@ -6,6 +6,7 @@ from support_agent.adapters import (
     JsonKnowledgeRepository,
     OpenAICompatibleGenerator,
     OpenAICompatibleHttpTransport,
+    ServiceNowPdiExecutor,
     ServiceNowSandboxExecutor,
     SqliteLifecycleRepository,
     UnavailableGenerator,
@@ -73,10 +74,21 @@ def create_app(
             generation=GenerationCoordinator(primary_generator),
         )
     lifecycle_repository = SqliteLifecycleRepository(resolved_settings.lifecycle_db_path)
+    if resolved_settings.execution_mode == "sandbox":
+        executor = ServiceNowSandboxExecutor(resolved_settings.lifecycle_db_path)
+    elif resolved_settings.execution_mode == "servicenow_pdi":
+        executor = ServiceNowPdiExecutor(
+            resolved_settings.servicenow_instance_url,
+            resolved_settings.servicenow_username,
+            resolved_settings.servicenow_password,
+            timeout_seconds=resolved_settings.servicenow_timeout_seconds,
+        )
+    else:
+        raise ValueError("EXECUTION_MODE must be sandbox or servicenow_pdi")
     application.state.lifecycle_service = RecommendationLifecycleService(
         assist_service,
         lifecycle_repository,
-        executor=ServiceNowSandboxExecutor(resolved_settings.lifecycle_db_path),
+        executor=executor,
     )
     application.include_router(health_router)
     application.include_router(assist_router)

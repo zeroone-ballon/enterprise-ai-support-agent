@@ -19,6 +19,7 @@ from support_agent.domain.lifecycle import (
     ExecutionResult,
     MockExecutionReceipt,
     RejectionDecision,
+    ServiceNowExecutionReceipt,
 )
 from support_agent.domain.recommendation import Evaluation, Recommendation
 from support_agent.domain.response import AssistResponse
@@ -48,4 +49,5 @@ __all__ = [
     "RecommendationStatus",
     "RejectionDecision",
     "ServiceNowSandboxAction",
+    "ServiceNowExecutionReceipt",
 ]

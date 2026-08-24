@@ -16,6 +16,10 @@ from support_agent.adapters.openai_compatible_generator import (
     OpenAICompatibleHttpTransport,
     UnavailableGenerator,
 )
+from support_agent.adapters.servicenow_pdi_executor import (
+    ServiceNowPdiError,
+    ServiceNowPdiExecutor,
+)
 from support_agent.adapters.servicenow_sandbox_executor import ServiceNowSandboxExecutor
 from support_agent.adapters.sqlite_lifecycle_repository import SqliteLifecycleRepository
 
@@ -29,5 +33,7 @@ __all__ = [
     "RecommendationNotFoundError",
     "SqliteLifecycleRepository",
     "ServiceNowSandboxExecutor",
+    "ServiceNowPdiError",
+    "ServiceNowPdiExecutor",
     "UnavailableGenerator",
 ]
