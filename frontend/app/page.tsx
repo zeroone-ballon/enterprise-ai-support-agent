@@ -61,7 +61,13 @@ type AssistResponse = {
     violations: string[];
   };
   confidence: number;
-  approval: { status: string; required: boolean };
+  approval: {
+    status: string;
+    required: boolean;
+    reviewer: string | null;
+    reason: string | null;
+    decided_at: string | null;
+  };
   generation: { mode: string; provider: string; fallback_used: boolean };
 };
 
@@ -82,6 +88,9 @@ export default function ReviewConsole() {
   const [result, setResult] = useState<AssistResponse | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [reviewReason, setReviewReason] = useState("");
+  const [decisionLoading, setDecisionLoading] = useState<"approve" | "reject" | null>(null);
+  const [decisionMessage, setDecisionMessage] = useState("");
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -90,6 +99,8 @@ export default function ReviewConsole() {
     setLoading(true);
     setError("");
     setResult(null);
+    setReviewReason("");
+    setDecisionMessage("");
     try {
       const demo = DEMO_CASES[demoCase];
       const response =
@@ -115,6 +126,30 @@ export default function ReviewConsole() {
       setError(caught instanceof Error ? caught.message : "Unexpected console error.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function decide(decision: "approve" | "reject") {
+    if (!result || !reviewReason.trim()) return;
+    setDecisionLoading(decision);
+    setDecisionMessage("");
+    try {
+      const response = await fetch(
+        `/api/recommendations/${encodeURIComponent(result.recommendation_id)}/decision`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ decision, reason: reviewReason.trim() }),
+        },
+      );
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.detail ?? "The review decision failed.");
+      setResult(body);
+      setDecisionMessage(decision === "approve" ? "Recommendation approved." : "Recommendation rejected.");
+    } catch (caught) {
+      setDecisionMessage(caught instanceof Error ? caught.message : "Unexpected review error.");
+    } finally {
+      setDecisionLoading(null);
     }
   }
 
@@ -184,6 +219,23 @@ export default function ReviewConsole() {
                 <p>{result.recommendation.suggested_response ?? "No response was proposed because sufficient evidence was not found."}</p>
               </div>
               <div className="guardrail">No external action is available in this read-only review stage.</div>
+              <div className="decisionPanel">
+                <div className="decisionHeading"><p className="sectionLabel">HUMAN DECISION</p><span>Authenticated on the console server</span></div>
+                {result.approval.status === "pending_approval" ? (
+                  <>
+                    <label htmlFor="review-reason">Review reason</label>
+                    <textarea id="review-reason" value={reviewReason} onChange={(event) => setReviewReason(event.target.value)} placeholder="Describe what you verified before making a decision." rows={3} />
+                    <div className="decisionActions">
+                      <button type="button" className="rejectButton" disabled={!reviewReason.trim() || decisionLoading !== null} onClick={() => decide("reject")}>{decisionLoading === "reject" ? "Rejecting…" : "Reject"}</button>
+                      <button type="button" className="approveButton" disabled={!recommended || !reviewReason.trim() || decisionLoading !== null} onClick={() => decide("approve")}>{decisionLoading === "approve" ? "Approving…" : "Approve recommendation"}</button>
+                    </div>
+                    {!recommended && <small>Abstained recommendations cannot be approved; they may only be rejected.</small>}
+                  </>
+                ) : (
+                  <div className={`decisionResult ${result.approval.status}`}><strong>{result.approval.status}</strong><span>{result.approval.reason}</span><small>{result.approval.reviewer}</small></div>
+                )}
+                {decisionMessage && <p className="decisionMessage" role="status">{decisionMessage}</p>}
+              </div>
             </section>
 
             <aside className="card evaluationCard">

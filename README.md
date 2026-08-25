@@ -160,6 +160,9 @@ npm run dev
 ```
 
 Keep FastAPI running at `http://127.0.0.1:8000`, or set `FASTAPI_BASE_URL` in `.env.local`.
+Reviewer credentials are read only by the Next.js server route. Never prefix these variables with
+`NEXT_PUBLIC_`, which would expose them to browser JavaScript. The checked-in values are local demo
+credentials whose SHA-256 digests are already the FastAPI development defaults.
 
 ## End-to-end release-candidate demo
 
