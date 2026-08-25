@@ -7,6 +7,7 @@ from support_agent.adapters import (
     OpenAICompatibleGenerator,
     OpenAICompatibleHttpTransport,
     ServiceNowPdiExecutor,
+    ServiceNowPdiIncidentReader,
     ServiceNowSandboxExecutor,
     SqliteLifecycleRepository,
     UnavailableGenerator,
@@ -74,6 +75,21 @@ def create_app(
             generation=GenerationCoordinator(primary_generator),
         )
     lifecycle_repository = SqliteLifecycleRepository(resolved_settings.lifecycle_db_path)
+    if all(
+        (
+            resolved_settings.servicenow_instance_url,
+            resolved_settings.servicenow_username,
+            resolved_settings.servicenow_password,
+        )
+    ):
+        application.state.servicenow_incident_reader = ServiceNowPdiIncidentReader(
+            resolved_settings.servicenow_instance_url,
+            resolved_settings.servicenow_username,
+            resolved_settings.servicenow_password,
+            timeout_seconds=resolved_settings.servicenow_timeout_seconds,
+        )
+    else:
+        application.state.servicenow_incident_reader = None
     if resolved_settings.execution_mode == "sandbox":
         executor = ServiceNowSandboxExecutor(resolved_settings.lifecycle_db_path)
     elif resolved_settings.execution_mode == "servicenow_pdi":

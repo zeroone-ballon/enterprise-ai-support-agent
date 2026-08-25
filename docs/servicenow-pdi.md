@@ -3,6 +3,13 @@
 This opt-in adapter is for a Personal Developer Instance and fictional incidents only. Sandbox
 execution remains the default.
 
+## Incident intake
+
+When PDI credentials are configured, `POST /assist/servicenow/{incident_number}` reads one exact
+Incident from the Table API, translates the allowed fields into the domain `Incident`, and creates
+the same evidence-backed, approval-gated recommendation as `POST /assist`. Reading is independent
+of `EXECUTION_MODE`; keeping `EXECUTION_MODE=sandbox` permits a read-only PDI demonstration.
+
 ## Boundary
 
 1. The API incident ID must be the exact ServiceNow incident number.
