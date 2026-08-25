@@ -1,4 +1,4 @@
-"""Human approval state machine with append-only auditing and mock execution."""
+"""Human approval state machine with append-only auditing and controlled execution."""
 
 from collections.abc import Callable
 from datetime import UTC, datetime
@@ -43,7 +43,7 @@ class MockExecutor:
 
 
 class RecommendationLifecycleService:
-    """Coordinate creation, human decisions, mock execution, and audit history."""
+    """Coordinate creation, human decisions, controlled execution, and audit history."""
 
     def __init__(
         self,
@@ -147,7 +147,7 @@ class RecommendationLifecycleService:
 
             response = self._repository.get(recommendation_id)
             if response.approval.status is not ApprovalStatus.APPROVED:
-                raise InvalidTransitionError("mock execution requires approved status")
+                raise InvalidTransitionError("execution requires approved status")
 
             executed_at = self._clock()
             receipt = self._executor.execute(response, request, executed_at)

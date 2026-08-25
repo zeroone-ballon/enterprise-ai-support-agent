@@ -10,7 +10,7 @@ from support_agent.domain.common import ApprovalStatus
 
 
 class Approval(DomainModel):
-    """Approval information for a recommendation and mock execution."""
+    """Approval information for a recommendation and controlled execution."""
 
     required: bool = True
     status: ApprovalStatus = ApprovalStatus.PENDING

@@ -1,4 +1,4 @@
-"""Authenticated human decision, audit, and idempotent mock execution endpoints."""
+"""Authenticated human decision, audit, and idempotent execution endpoints."""
 
 from typing import Annotated
 
