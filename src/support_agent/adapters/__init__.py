@@ -20,6 +20,10 @@ from support_agent.adapters.servicenow_pdi_executor import (
     ServiceNowPdiError,
     ServiceNowPdiExecutor,
 )
+from support_agent.adapters.servicenow_pdi_incident_reader import (
+    ServiceNowIncidentReadError,
+    ServiceNowPdiIncidentReader,
+)
 from support_agent.adapters.servicenow_sandbox_executor import ServiceNowSandboxExecutor
 from support_agent.adapters.sqlite_lifecycle_repository import SqliteLifecycleRepository
 
@@ -35,5 +39,7 @@ __all__ = [
     "ServiceNowSandboxExecutor",
     "ServiceNowPdiError",
     "ServiceNowPdiExecutor",
+    "ServiceNowIncidentReadError",
+    "ServiceNowPdiIncidentReader",
     "UnavailableGenerator",
 ]

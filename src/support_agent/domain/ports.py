@@ -33,6 +33,13 @@ class Retriever(Protocol):
         """Return ranked published evidence above the configured threshold."""
 
 
+class IncidentSourcePort(Protocol):
+    """Load one external incident and translate it into the domain model."""
+
+    def get(self, incident_id: str) -> Incident:
+        """Return one exact incident or fail without producing partial domain data."""
+
+
 class LifecycleRepository(Protocol):
     """Persist current recommendation state and immutable audit events."""
 
