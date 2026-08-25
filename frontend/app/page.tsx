@@ -71,6 +71,9 @@ type AssistResponse = {
   generation: { mode: string; provider: string; fallback_used: boolean };
 };
 
+type ExecutionReceipt = { status: string; side_effects: boolean; executor: string; executed_at: string; summary: string; target_number?: string };
+type AuditEvent = { sequence: number; event_type: string; actor: string; occurred_at: string; details: Record<string, string> };
+
 function Metric({ label, value }: { label: string; value: boolean }) {
   return (
     <div className="metric">
@@ -91,6 +94,11 @@ export default function ReviewConsole() {
   const [reviewReason, setReviewReason] = useState("");
   const [decisionLoading, setDecisionLoading] = useState<"approve" | "reject" | null>(null);
   const [decisionMessage, setDecisionMessage] = useState("");
+  const [receipt, setReceipt] = useState<ExecutionReceipt | null>(null);
+  const [auditEvents, setAuditEvents] = useState<AuditEvent[]>([]);
+  const [idempotencyKey, setIdempotencyKey] = useState("");
+  const [executionLoading, setExecutionLoading] = useState(false);
+  const [executionMessage, setExecutionMessage] = useState("");
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -101,6 +109,7 @@ export default function ReviewConsole() {
     setResult(null);
     setReviewReason("");
     setDecisionMessage("");
+    setReceipt(null); setAuditEvents([]); setIdempotencyKey(""); setExecutionMessage("");
     try {
       const demo = DEMO_CASES[demoCase];
       const response =
@@ -127,6 +136,32 @@ export default function ReviewConsole() {
     } finally {
       setLoading(false);
     }
+  }
+
+  async function loadAudit(recommendationId: string) {
+    const response = await fetch(`/api/recommendations/${encodeURIComponent(recommendationId)}/audit`, { cache: "no-store" });
+    const body = await response.json();
+    if (!response.ok) throw new Error(body.detail ?? "Unable to load audit events.");
+    setAuditEvents(body);
+  }
+
+  async function executeRecommendation() {
+    if (!result) return;
+    setExecutionLoading(true); setExecutionMessage("");
+    const key = idempotencyKey || `console-${crypto.randomUUID()}`;
+    setIdempotencyKey(key);
+    try {
+      const response = await fetch(`/api/recommendations/${encodeURIComponent(result.recommendation_id)}/execute`, {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ idempotencyKey: key }),
+      });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.detail ?? "Execution failed.");
+      setResult(body.recommendation); setReceipt(body.receipt);
+      await loadAudit(result.recommendation_id);
+      setExecutionMessage(receipt ? "Stored result returned without another side effect." : "Execution completed and audit refreshed.");
+    } catch (caught) {
+      setExecutionMessage(caught instanceof Error ? caught.message : "Unexpected execution error.");
+    } finally { setExecutionLoading(false); }
   }
 
   async function decide(decision: "approve" | "reject") {
@@ -202,7 +237,7 @@ export default function ReviewConsole() {
 
         {result && (
           <div className="reviewGrid">
-            <div className="modeBanner"><span>Incident Source <strong>{sourceMode === "local" ? "Local fixture" : "ServiceNow PDI"}</strong></span><span>Execution Mode <strong>Review only</strong></span><span>External Side Effects <strong>None</strong></span></div>
+            <div className="modeBanner"><span>Incident Source <strong>{sourceMode === "local" ? "Local fixture" : "ServiceNow PDI"}</strong></span><span>Execution Mode <strong>{receipt ? (receipt.side_effects ? "ServiceNow PDI" : "Sandbox") : "Review only"}</strong></span><span>External Side Effects <strong>{receipt ? String(receipt.side_effects) : "None"}</strong></span></div>
             <section className="card recommendationCard">
               <div className="cardHeader">
                 <div><p className="eyebrow">{result.incident_id}</p><h2>{result.recommendation.summary}</h2></div>
@@ -236,6 +271,15 @@ export default function ReviewConsole() {
                 )}
                 {decisionMessage && <p className="decisionMessage" role="status">{decisionMessage}</p>}
               </div>
+              {(result.approval.status === "approved" || result.approval.status === "executed") && (
+                <div className="executionPanel">
+                  <div className="decisionHeading"><p className="sectionLabel">CONTROLLED EXECUTION</p><span>Executor authenticated on server</span></div>
+                  {!receipt ? <p>Execute the approved recommendation through the configured adapter.</p> : <div className="receipt"><strong>{receipt.status}</strong><span>{receipt.summary}</span><small>Side effects: {String(receipt.side_effects)} · {receipt.executor}</small></div>}
+                  <button type="button" onClick={executeRecommendation} disabled={executionLoading}>{executionLoading ? "Executing…" : receipt ? "Retry with same idempotency key" : "Execute approved recommendation"}</button>
+                  {idempotencyKey && <code className="idempotencyKey">{idempotencyKey}</code>}
+                  {executionMessage && <p className="decisionMessage" role="status">{executionMessage}</p>}
+                </div>
+              )}
             </section>
 
             <aside className="card evaluationCard">
@@ -261,6 +305,7 @@ export default function ReviewConsole() {
                 </ol>
               )}
             </section>
+            {auditEvents.length > 0 && <section className="card evidenceCard"><p className="sectionLabel">AUDIT TIMELINE</p><h2>{auditEvents.length} immutable events</h2><ol className="auditList">{auditEvents.map((event) => <li key={event.sequence}><span className="rank">{event.sequence}</span><div><strong>{event.event_type.replaceAll("_", " ")}</strong><p>{event.actor} · {new Date(event.occurred_at).toLocaleString()}</p></div></li>)}</ol></section>}
           </div>
         )}
       </section>
