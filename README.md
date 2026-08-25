@@ -145,6 +145,22 @@ uv run python -m support_agent.evaluate --output reports/evaluation.json
 The evaluation command checks all eight fictional gold cases and exits non-zero on any mismatch.
 The CI workflow additionally enforces at least 90% test coverage.
 
+## AI Review Console
+
+The read-only Next.js console in `frontend/` defaults to three local demo cases and can optionally
+load one fictional PDI Incident. It displays classification, recommendation, evaluation, and ranked
+evidence. Both modes proxy requests through server routes so the browser does not need direct
+FastAPI network access. Local Demo remains available when the PDI is sleeping or unavailable.
+
+```bash
+cd frontend
+cp .env.example .env.local
+npm install
+npm run dev
+```
+
+Keep FastAPI running at `http://127.0.0.1:8000`, or set `FASTAPI_BASE_URL` in `.env.local`.
+
 ## End-to-end release-candidate demo
 
 With the API running in one terminal, execute the complete local scenario in another:
