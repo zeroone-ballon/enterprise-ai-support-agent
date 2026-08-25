@@ -2,6 +2,37 @@
 
 import { FormEvent, useState } from "react";
 
+type SourceMode = "local" | "pdi";
+
+const DEMO_CASES = {
+  vpn: {
+    label: "VPN account locked",
+    short_description: "VPN account locked after repeated sign-in attempts",
+    description:
+      "The remote employee receives an account locked message after entering an old password several times in the corporate VPN client.",
+    category: "access",
+    priority: "P3",
+  },
+  microsoft: {
+    label: "Microsoft 365 sign-in loop",
+    short_description: "Microsoft 365 sign-in loops back to the login page",
+    description:
+      "The user can enter credentials but Outlook on the web returns to the sign-in page. The account is not reported as locked and MFA succeeds.",
+    category: "access",
+    priority: "P3",
+  },
+  disk: {
+    label: "Managed PC low disk space",
+    short_description: "Managed laptop reports critically low disk space",
+    description:
+      "The Windows laptop has less than 2 GB free on drive C. The user needs a safe cleanup procedure that does not remove business documents.",
+    category: "hardware",
+    priority: "P3",
+  },
+} as const;
+
+type DemoCase = keyof typeof DEMO_CASES;
+
 type Evidence = {
   knowledge_id: string;
   title: string;
@@ -45,6 +76,8 @@ function Metric({ label, value }: { label: string; value: boolean }) {
 }
 
 export default function ReviewConsole() {
+  const [sourceMode, setSourceMode] = useState<SourceMode>("local");
+  const [demoCase, setDemoCase] = useState<DemoCase>("vpn");
   const [incidentNumber, setIncidentNumber] = useState("");
   const [result, setResult] = useState<AssistResponse | null>(null);
   const [error, setError] = useState("");
@@ -53,14 +86,28 @@ export default function ReviewConsole() {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const normalized = incidentNumber.trim().toUpperCase();
-    if (!normalized) return;
+    if (sourceMode === "pdi" && !normalized) return;
     setLoading(true);
     setError("");
     setResult(null);
     try {
-      const response = await fetch(`/api/assist/servicenow/${encodeURIComponent(normalized)}`, {
-        method: "POST",
-      });
+      const demo = DEMO_CASES[demoCase];
+      const response =
+        sourceMode === "local"
+          ? await fetch("/api/assist/local", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                incident_id: `INC-UI-${demoCase.toUpperCase()}-${Date.now()}`,
+                short_description: demo.short_description,
+                description: demo.description,
+                category: demo.category,
+                priority: demo.priority,
+              }),
+            })
+          : await fetch(`/api/assist/servicenow/${encodeURIComponent(normalized)}`, {
+              method: "POST",
+            });
       const body = await response.json();
       if (!response.ok) throw new Error(body.detail ?? "Unable to review this Incident.");
       setResult(body);
@@ -90,12 +137,23 @@ export default function ReviewConsole() {
         </div>
 
         <form className="searchPanel" onSubmit={submit}>
-          <label htmlFor="incident">ServiceNow Incident number</label>
+          <fieldset className="sourceToggle">
+            <legend>Incident source</legend>
+            <button type="button" className={sourceMode === "local" ? "active" : ""} onClick={() => { setSourceMode("local"); setError(""); setResult(null); }}>Local Demo</button>
+            <button type="button" className={sourceMode === "pdi" ? "active" : ""} onClick={() => { setSourceMode("pdi"); setError(""); setResult(null); }}>ServiceNow PDI</button>
+          </fieldset>
+          <label htmlFor={sourceMode === "local" ? "demo-case" : "incident"}>{sourceMode === "local" ? "Fictional support case" : "ServiceNow Incident number"}</label>
           <div className="searchRow">
-            <input id="incident" value={incidentNumber} onChange={(event) => setIncidentNumber(event.target.value)} placeholder="INC0010002" pattern="[A-Za-z0-9._-]{1,64}" autoComplete="off" />
-            <button type="submit" disabled={loading || !incidentNumber.trim()}>{loading ? "Loading…" : "Load Incident"}</button>
+            {sourceMode === "local" ? (
+              <select id="demo-case" value={demoCase} onChange={(event) => setDemoCase(event.target.value as DemoCase)}>
+                {Object.entries(DEMO_CASES).map(([key, item]) => <option key={key} value={key}>{item.label}</option>)}
+              </select>
+            ) : (
+              <input id="incident" value={incidentNumber} onChange={(event) => setIncidentNumber(event.target.value)} placeholder="INC0010002" pattern="[A-Za-z0-9._-]{1,64}" autoComplete="off" />
+            )}
+            <button type="submit" disabled={loading || (sourceMode === "pdi" && !incidentNumber.trim())}>{loading ? "Loading…" : "Load Incident"}</button>
           </div>
-          <small>Read-only intake. Loading an Incident does not update ServiceNow.</small>
+          <small>{sourceMode === "local" ? "Runs entirely against local fixtures and sandbox state. No PDI is required." : "Read-only PDI intake. Loading an Incident does not update ServiceNow."}</small>
         </form>
 
         {error && <div className="errorPanel" role="alert"><strong>Review unavailable</strong><span>{error}</span></div>}
@@ -109,6 +167,7 @@ export default function ReviewConsole() {
 
         {result && (
           <div className="reviewGrid">
+            <div className="modeBanner"><span>Incident Source <strong>{sourceMode === "local" ? "Local fixture" : "ServiceNow PDI"}</strong></span><span>Execution Mode <strong>Review only</strong></span><span>External Side Effects <strong>None</strong></span></div>
             <section className="card recommendationCard">
               <div className="cardHeader">
                 <div><p className="eyebrow">{result.incident_id}</p><h2>{result.recommendation.summary}</h2></div>
