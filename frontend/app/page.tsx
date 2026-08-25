@@ -133,7 +133,7 @@ export default function ReviewConsole() {
       <section className="workspace">
         <div className="intro">
           <div><p className="eyebrow">INCIDENT REVIEW</p><h1>Ground decisions in evidence.</h1></div>
-          <p>Load one ServiceNow PDI Incident, inspect the recommendation and verify every cited source before approval.</p>
+          <p>Load a local demo case or a ServiceNow PDI Incident, then inspect the recommendation and verify its retrieved evidence.</p>
         </div>
 
         <form className="searchPanel" onSubmit={submit}>
@@ -196,7 +196,7 @@ export default function ReviewConsole() {
             </aside>
 
             <section className="card evidenceCard">
-              <div className="cardHeader"><div><p className="sectionLabel">CITED EVIDENCE</p><h2>{result.evidence.length} published sources</h2></div></div>
+              <div className="cardHeader"><div><p className="sectionLabel">RETRIEVED EVIDENCE</p><h2>{result.evidence.length} published candidates</h2></div></div>
               {result.evidence.length === 0 ? <p className="noEvidence">No eligible evidence cleared the relevance threshold.</p> : (
                 <ol className="evidenceList">
                   {result.evidence.map((item, index) => (
