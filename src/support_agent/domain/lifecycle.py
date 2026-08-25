@@ -20,6 +20,7 @@ class AuditEventType(StrEnum):
     APPROVED = "recommendation_approved"
     REJECTED = "recommendation_rejected"
     EXECUTED = "mock_execution_completed"
+    PDI_UPDATED = "servicenow_pdi_update_completed"
 
 
 class ApprovalDecision(DomainModel):
@@ -64,8 +65,22 @@ class MockExecutionReceipt(DomainModel):
     summary: str = "No external system was changed."
 
 
+class ServiceNowExecutionReceipt(DomainModel):
+    """Proof of an approved update to one PDI incident."""
+
+    recommendation_id: RecommendationId
+    status: Literal["completed"] = "completed"
+    executor: Actor
+    executed_at: datetime
+    side_effects: Literal[True] = True
+    target_table: Literal["incident"] = "incident"
+    target_number: str
+    target_sys_id: str
+    summary: str
+
+
 class ExecutionResult(DomainModel):
     """Updated recommendation plus its mock execution receipt."""
 
     recommendation: AssistResponse
-    receipt: MockExecutionReceipt
+    receipt: MockExecutionReceipt | ServiceNowExecutionReceipt

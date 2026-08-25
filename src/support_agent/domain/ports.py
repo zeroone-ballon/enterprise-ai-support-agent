@@ -11,6 +11,7 @@ from support_agent.domain.lifecycle import (
     ExecutionRequest,
     ExecutionResult,
     MockExecutionReceipt,
+    ServiceNowExecutionReceipt,
 )
 from support_agent.domain.response import AssistResponse
 
@@ -67,7 +68,7 @@ class ExecutionPort(Protocol):
         response: AssistResponse,
         request: ExecutionRequest,
         executed_at: datetime,
-    ) -> MockExecutionReceipt: ...
+    ) -> MockExecutionReceipt | ServiceNowExecutionReceipt: ...
 
 
 class RecommendationGenerationPort(Protocol):

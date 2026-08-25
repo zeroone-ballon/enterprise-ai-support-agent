@@ -35,6 +35,11 @@ class Settings:
     llm_api_key: str = field(default="", repr=False)
     llm_model: str = ""
     llm_timeout_seconds: float = 20.0
+    execution_mode: str = "sandbox"
+    servicenow_instance_url: str = ""
+    servicenow_username: str = ""
+    servicenow_password: str = field(default="", repr=False)
+    servicenow_timeout_seconds: float = 10.0
 
     def validate_for_startup(self) -> None:
         """Reject insecure production settings while preserving local demo defaults."""
@@ -92,5 +97,14 @@ class Settings:
             llm_model=os.getenv("LLM_MODEL", defaults.llm_model),
             llm_timeout_seconds=float(
                 os.getenv("LLM_TIMEOUT_SECONDS", defaults.llm_timeout_seconds)
+            ),
+            execution_mode=os.getenv("EXECUTION_MODE", defaults.execution_mode).casefold(),
+            servicenow_instance_url=os.getenv(
+                "SERVICENOW_INSTANCE_URL", defaults.servicenow_instance_url
+            ),
+            servicenow_username=os.getenv("SERVICENOW_USERNAME", defaults.servicenow_username),
+            servicenow_password=os.getenv("SERVICENOW_PASSWORD", defaults.servicenow_password),
+            servicenow_timeout_seconds=float(
+                os.getenv("SERVICENOW_TIMEOUT_SECONDS", defaults.servicenow_timeout_seconds)
             ),
         )

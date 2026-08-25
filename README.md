@@ -113,6 +113,26 @@ curl -s http://127.0.0.1:8000/recommendations/REC-INC-LIVE-001/audit \
 
 The execution receipt always reports `"status":"simulated"` and `"side_effects":false`. Repeating execution with the same `Idempotency-Key` returns the original result without adding another audit event. SQLite state remains available after the application restarts.
 
+## Optional ServiceNow PDI execution
+
+The default `EXECUTION_MODE=sandbox` makes no network call. On an isolated Personal Developer
+Instance only, `EXECUTION_MODE=servicenow_pdi` resolves the submitted `incident_id` as an exact
+ServiceNow incident number and updates only `work_notes` after authenticated human approval. The
+receipt then reports `"status":"completed"` and `"side_effects":true`.
+
+```env
+EXECUTION_MODE=servicenow_pdi
+SERVICENOW_INSTANCE_URL=https://devXXXXX.service-now.com
+SERVICENOW_USERNAME=replace-with-integration-user
+SERVICENOW_PASSWORD=use-a-local-secret
+SERVICENOW_TIMEOUT_SECONDS=10
+```
+
+Never commit these values. PDI mode rejects non-HTTPS, non-`service-now.com`, and path-bearing
+origins; fails closed on timeout, malformed JSON, non-2xx responses, and zero or multiple incident
+matches; and never logs the Authorization header. The initial adapter intentionally does not change
+state, assignment, priority, or custom fields.
+
 ## Test and lint
 
 ```bash
