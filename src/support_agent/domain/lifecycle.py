@@ -80,7 +80,7 @@ class ServiceNowExecutionReceipt(DomainModel):
 
 
 class ExecutionResult(DomainModel):
-    """Updated recommendation plus its mock execution receipt."""
+    """Updated recommendation plus its execution receipt."""
 
     recommendation: AssistResponse
     receipt: MockExecutionReceipt | ServiceNowExecutionReceipt
